@@ -4,16 +4,14 @@ import (
 
 	"encoding/json"
 	"net/http"
-	"fmt"
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/tikalk/go-distribution-workshop/models"
+	"fmt"
 )
 
-func ExecuteDisplay(externalWaitGroup *sync.WaitGroup){
+func LaunchDisplay(port int, externalWaitGroup *sync.WaitGroup){
 	defer messaging.Stop()
-
-	fmt.Println(http.Dir("display_client"))
 
 	displayInput := getDisplayChannel()
 
@@ -33,7 +31,7 @@ func ExecuteDisplay(externalWaitGroup *sync.WaitGroup){
 		fs := http.FileServer(http.Dir("display_client"))
 		http.Handle("/client/", http.StripPrefix("/client", fs))
 
-		http.ListenAndServe(":8080", nil)
+		http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	}()
 
 	for ds := range displayInput {
