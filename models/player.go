@@ -2,16 +2,14 @@ package models
 
 import (
 	"encoding/json"
-	"github.com/Tikal/distributionWorkshop/messaging"
 	"fmt"
 	"time"
 	"math"
 	"math/rand"
 	"sync"
-	"github.com/Tikal/distributionWorkshop/utils"
+	"github.com/tikalk/go-distribution-workshop/messaging"
+	"github.com/tikalk/go-distribution-workshop/utils"
 )
-
-
 
 const kickThreshold = 4
 const kickVelocityThreshold = 4

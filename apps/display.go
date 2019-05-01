@@ -1,14 +1,16 @@
-package main
+package apps
 
 import (
-	"github.com/Tikal/distributionWorkshop/messaging"
-	"github.com/Tikal/distributionWorkshop/models"
+
 	"encoding/json"
 	"net/http"
 	"fmt"
+	"sync"
+	"github.com/tikalk/go-distribution-workshop/messaging"
+	"github.com/tikalk/go-distribution-workshop/models"
 )
 
-func main(){
+func ExecuteDisplay(externalWaitGroup *sync.WaitGroup){
 	defer messaging.Stop()
 
 	fmt.Println(http.Dir("display_client"))
@@ -36,6 +38,10 @@ func main(){
 
 	for ds := range displayInput {
 		gameField.Update(ds)
+	}
+
+	if externalWaitGroup != nil {
+		externalWaitGroup.Done()
 	}
 }
 

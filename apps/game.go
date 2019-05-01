@@ -1,4 +1,4 @@
-package main
+package apps
 
 import (
 	"time"
@@ -10,9 +10,7 @@ import (
 	"github.com/tikalk/go-distribution-workshop/models"
 )
 
-// TODO have all players and redis connectio parameters passed via CLI flags so that people with no Golang IDE can still participate in the workshop
-
-func main() {
+func ExecuteSimulation(externalWaitGroup *sync.WaitGroup) {
 	defer messaging.Stop()
 
 	throwBall()
@@ -24,7 +22,7 @@ func main() {
 	wg := sync.WaitGroup{}
 	wg.Add(numPlayers)
 
-
+	fmt.Println("Adding players")
 	for i := 0; i < numPlayers; i++ {
 
 		player := &models.Player{
@@ -43,6 +41,9 @@ func main() {
 	}
 
 	wg.Wait()
+	if externalWaitGroup != nil {
+		externalWaitGroup.Done()
+	}
 
 
 }
@@ -64,6 +65,7 @@ func getDisplayOutputChannel() chan <- *models.DisplayStatus  {
 }
 
 func throwBall(){
+	fmt.Println("Throwing ball!")
 	output, _ := messaging.GetOutputChannel(messaging.BallChannelName)
 
 	bs := &models.Ball{X: 8, Y: 2, Vx: 0, Vy: 0, Vz: 0, Z: 50}

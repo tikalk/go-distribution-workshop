@@ -27,8 +27,8 @@ const RemoteAddr = "redis-19098.c55.eu-central-1-1.ec2.cloud.redislabs.com:19098
 const LocalPass = ""
 const RemotePass = "q1w2e3r4"
 
-const RedisAddr = RemoteAddr
-const RedisPass= RemotePass
+const RedisAddr = LocalAddr
+const RedisPass= LocalPass
 
 
 func init(){
@@ -46,8 +46,6 @@ func init(){
 	case Rabbit:
 		transport = nil
 	}
-
-	println()
 }
 
 func Stop(){
@@ -60,12 +58,12 @@ func GetErrorChannel() <-chan error {
 	return transport.ErrChan()
 }
 func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
-	fmt.Println("GetOutputChannel")
+	fmt.Printf("GetOutputChannel: %s\n", name)
 	return transport.Send(name), transport
 }
 
 func GetInputChannel(name string) (<-chan []byte, vice.Transport){
-	fmt.Println("GetInputChannel")
+	fmt.Printf("GetInputChannel: %s\n", name)
 	return transport.Receive(name), transport
 }
 
