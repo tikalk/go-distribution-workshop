@@ -56,10 +56,11 @@ func getTransport(){
 }
 
 func Stop(){
+	/*
 	if transport != nil {
 		transport.Stop()
 		<-transport.Done()
-	}
+	}*/
 }
 func GetErrorChannel() <-chan error {
 	return transport.ErrChan()

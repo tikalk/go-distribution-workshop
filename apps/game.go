@@ -21,6 +21,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 	wg := sync.WaitGroup{}
 	wg.Add(numPlayers)
 
+
 	for i := 0; i < numPlayers; i++ {
 		u2 := uuid.NewV4()
 
@@ -42,6 +43,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 	}
 
 	wg.Wait()
+
 	if externalWaitGroup != nil {
 		externalWaitGroup.Done()
 	}

@@ -14,7 +14,8 @@ type (
 		lastCleanup time.Time
 	}
 )
-const cleanupInterval = 5
+const cleanupInterval = 5 * time.Second
+const timeToDeclareDead = 15 * time.Second
 
 func NewGameField() *GameField{
 	res := &GameField{Items: syncmap.Map{}}
@@ -22,14 +23,15 @@ func NewGameField() *GameField{
 }
 
 func (gf *GameField) cleanup(){
-	if time.Now().Sub(gf.lastCleanup).Seconds() > cleanupInterval {
+	if time.Now().Sub(gf.lastCleanup) > cleanupInterval {
 		gf.Items.Range(func(key, value interface{}) bool {
 			val, ok := value.(*DisplayStatus)
 			if !ok {
 				// this will break iteration
 				return false
 			}
-			if time.Now().Sub(val.LastUpdated) > 60*time.Second && val.ItemType != TypeBall {
+
+			if time.Now().Sub(val.LastUpdated) > timeToDeclareDead && val.ItemType != TypeBall {
 				gf.Items.Delete(key)
 			}
 			return true

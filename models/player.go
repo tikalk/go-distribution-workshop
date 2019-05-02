@@ -102,32 +102,31 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 
 		for {
 			select {
-			case ball = <-p.ballInput:
-				ticker.Stop()
-				distance := p.getDistanceToBall(ball)
+				case ball = <-p.ballInput:
+					ticker.Stop()
+					distance := p.getDistanceToBall(ball)
 
-				if distance < kickThreshold &&
-					ball.GetSurfaceVelocity() < kickVelocityThreshold &&
-					time.Now().Sub(ball.LastKick) > 1*time.Second {
+					if distance < kickThreshold &&
+						ball.GetSurfaceVelocity() < kickVelocityThreshold &&
+						time.Now().Sub(ball.LastKick) > 1*time.Second {
 
-					p.applyKick(ball)
+						p.applyKick(ball)
 
-				} else {
+					} else {
 
-					time.Sleep(20 * time.Millisecond)
-					ball.ApplyKinematics()
+						time.Sleep(20 * time.Millisecond)
+						ball.ApplyKinematics()
 
-				}
+					}
 
-				p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
-				ball.LastUpdated = time.Now()
+					p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+					ball.LastUpdated = time.Now()
 
-				p.ballOutput <- ball
-				reportDisplay(ball, displayChannel)
+					p.ballOutput <- ball
+					reportDisplay(ball, displayChannel)
 
-			case <-ticker.C:
-				p.log("Waiting for the ball...\n")
-
+				case <-ticker.C:
+					p.log("Waiting for the ball...\n")
 			}
 		}
 	}()

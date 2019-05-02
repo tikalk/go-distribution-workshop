@@ -51,6 +51,11 @@ let Player = class {
 	forget(){
 		this.hl.visible = false;
 	}
+
+	kill(){
+		// TODO add some cool animation
+		this.config.stage.removeChild(this.container)
+	}
 }
 
 let Ball = class {
@@ -98,8 +103,6 @@ async function init() {
 		ballRadius: 5,
 	}
 
-
-
 	let stage = new createjs.Stage("main_canvas");
 
 	config.stage = stage;
@@ -112,12 +115,15 @@ async function init() {
 		let res = await fetch("/display");
 		let display = await res.json();
 
+		let updatedKeys = {}
+
+
 		for (let key in display.items){
 			let item = display.items[key];
 			key = "player|" + item.team_id + "|" + item.item_id;
 			switch(item.item_type){
 				case "player":
-
+					updatedKeys[key] = true;
 					if (key in players) {
 						players[key].update(item);
 					} else {
@@ -129,13 +135,23 @@ async function init() {
 						if(item.item_id && players[key]) {
 
 
-							if(lastHolder ){
+							if(lastHolder){
 								lastHolder.forget();
 							}
 							lastHolder = players[key]
 							lastHolder.highlight();
 						}
 					break;
+			}
+		}
+
+		for (let key in players){
+			if (!updatedKeys[key]){
+				players[key].kill();
+				if (lastHolder == players[key]) {
+					lastHolder = null;
+				}
+				delete players[key];
 			}
 		}
 
