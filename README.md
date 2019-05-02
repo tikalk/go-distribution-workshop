@@ -1,4 +1,4 @@
-# go-distribution-workshop
+# Go Workshop: Distributed MSA Soccer #
 
 ## Environment ##
 
