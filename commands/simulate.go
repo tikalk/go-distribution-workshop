@@ -5,6 +5,9 @@ import (
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/urfave/cli"
+	"time"
+	"fmt"
+	"github.com/mgutz/ansi"
 )
 
 var SimulateCommand = cli.Command{
@@ -26,18 +29,24 @@ var SimulateCommand = cli.Command{
 	}
 
 func simulate(c *cli.Context) error {
-	return nil
-}
-
-func Standalone(){
 	defer messaging.Stop()
+	setupRedis(c)
+
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 
 
-	go apps.ExecuteSimulation(wg)
-	//go apps.LaunchDisplay(wg)
+	port := c.Int("port")
+	go apps.LaunchDisplay(port, wg)
+
+	players := c.Int("players")
+	go apps.ExecuteSimulation(players, wg)
+
+	time.Sleep(200 * time.Millisecond)
+	fmt.Printf(ansi.Color("\n\nDisplay server launched successfully on port %d\n", "green"), port)
 
 	wg.Wait()
 
+	return nil
 }
+

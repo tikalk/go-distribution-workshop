@@ -11,8 +11,10 @@ import (
 type (
 	GameField struct {
 		Items syncmap.Map
+		lastCleanup time.Time
 	}
 )
+const cleanupInterval = 5
 
 func NewGameField() *GameField{
 	res := &GameField{Items: syncmap.Map{}}
@@ -20,18 +22,19 @@ func NewGameField() *GameField{
 }
 
 func (gf *GameField) cleanup(){
-	gf.Items.Range(func(key, value interface{}) bool {
-		val, ok := value.(*DisplayStatus)
-		if !ok {
-			// this will break iteration
-			return false
-		}
-		if time.Now().Sub(val.LastUpdated) > 60 * time.Second && val.ItemType != TypeBall{
-			gf.Items.Delete(key)
-		}
-		return true
-	})
-
+	if time.Now().Sub(gf.lastCleanup).Seconds() > cleanupInterval {
+		gf.Items.Range(func(key, value interface{}) bool {
+			val, ok := value.(*DisplayStatus)
+			if !ok {
+				// this will break iteration
+				return false
+			}
+			if time.Now().Sub(val.LastUpdated) > 60*time.Second && val.ItemType != TypeBall {
+				gf.Items.Delete(key)
+			}
+			return true
+		})
+	}
 }
 
 func (gf *GameField) Update(item *DisplayStatus){
@@ -40,7 +43,7 @@ func (gf *GameField) Update(item *DisplayStatus){
 		key = fmt.Sprintf("%s|%s|%s", item.ItemType, item.TeamID, item.ItemID)
 	}
 	gf.Items.Store(key, item)
-	//gf.cleanup()
+	gf.cleanup()
 }
 
 func (gf *GameField) MarshalJSON() ([]byte, error){

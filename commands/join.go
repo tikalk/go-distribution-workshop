@@ -4,12 +4,16 @@ import (
 	"github.com/urfave/cli"
 	"github.com/tikalk/go-distribution-workshop/models"
 	"fmt"
+	"github.com/tikalk/go-distribution-workshop/messaging"
+	"sync"
+	"github.com/tikalk/go-distribution-workshop/apps"
+	"strings"
 )
 
-var PlayCommand = cli.Command{
-	Name:  "play",
-	Usage: "Participate in an existing game",
-	Action: assignPlayers,
+var JoinCommand = cli.Command{
+	Name: 	"join",
+	Usage:  "Join an existing game",
+	Action: joinGame,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "players",
@@ -28,6 +32,21 @@ var PlayCommand = cli.Command{
 	},
 }
 
-func assignPlayers(c *cli.Context) error {
+func joinGame(c *cli.Context) error {
+	defer messaging.Stop()
+	setupRedis(c)
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	playersFlag := c.String("players")
+	players := strings.Split(playersFlag, ",")
+
+	teamFlag := c.String("team")
+
+	go apps.JoinGame(players, models.Team(teamFlag), wg)
+
+	wg.Wait()
+
 	return nil
 }

@@ -1,3 +1,5 @@
+// TODO remove dead players from display
+
 let Player = class {
 	constructor(model, config) {
 		this.config = config;

@@ -7,6 +7,7 @@ import (
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"fmt"
 	"time"
+	"github.com/mgutz/ansi"
 )
 
 var DisplayCommand = cli.Command{
@@ -24,6 +25,9 @@ var DisplayCommand = cli.Command{
 
 func display(c *cli.Context) error {
 	defer messaging.Stop()
+
+	setupRedis(c)
+
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
@@ -31,7 +35,8 @@ func display(c *cli.Context) error {
 	go apps.LaunchDisplay(port, wg)
 
 	time.Sleep(100 * time.Millisecond)
-	fmt.Printf("Display server laucned successfully on port %d\n", port)
+	fmt.Printf(ansi.Color("Display server launched successfully on port %d\n", "green"), port)
+
 
 	wg.Wait()
 	return nil

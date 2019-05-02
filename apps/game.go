@@ -8,25 +8,65 @@ import (
 	"fmt"
 	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/tikalk/go-distribution-workshop/models"
+	"github.com/satori/go.uuid"
 )
 
-func ExecuteSimulation(externalWaitGroup *sync.WaitGroup) {
+func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGroup) {
+	defer messaging.Stop()
+
+	displayChannel := getDisplayOutputChannel()
+	rand.Seed(time.Now().UnixNano())
+
+	numPlayers := len(players)
+	wg := sync.WaitGroup{}
+	wg.Add(numPlayers)
+
+	for i := 0; i < numPlayers; i++ {
+		u2 := uuid.NewV4()
+
+		player := &models.Player{
+			ID: u2.String(),
+			Name: players[i],
+			X: rand.Float64() * 100,
+			Y: rand.Float64() * 100,
+			MaxVelocity: rand.Float64() * 0.1,
+		}
+		if (team == models.TeamBoth && i %2 == 0) || team == models.TeamRed{
+			player.TeamID = models.TeamRed
+		} else{
+			player.TeamID = models.TeamBlue
+		}
+		fmt.Printf("Added player %s\n", players[i])
+		player.Activate(displayChannel, wg)
+
+	}
+
+	wg.Wait()
+	if externalWaitGroup != nil {
+		externalWaitGroup.Done()
+	}
+}
+
+func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 	defer messaging.Stop()
 
 	throwBall()
 
-	var numPlayers = 6
 
 	displayChannel := getDisplayOutputChannel()
 	rand.Seed(time.Now().UnixNano())
 	wg := sync.WaitGroup{}
 	wg.Add(numPlayers)
 
-	fmt.Println("Adding players")
+	fmt.Println("Adding players...")
+
 	for i := 0; i < numPlayers; i++ {
 
+		u2 := uuid.NewV4()
+
 		player := &models.Player{
-			ID: fmt.Sprintf("Player %d", i),
+			ID: u2.String(),
+			Name: fmt.Sprintf("Player %d", i),		// TODO get names from list
 			X: rand.Float64() * 100,
 			Y: rand.Float64() * 100,
 			MaxVelocity: rand.Float64() * 0.1,
@@ -44,7 +84,6 @@ func ExecuteSimulation(externalWaitGroup *sync.WaitGroup) {
 	if externalWaitGroup != nil {
 		externalWaitGroup.Done()
 	}
-
 
 }
 

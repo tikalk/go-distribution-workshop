@@ -13,8 +13,11 @@ var provider = Redis
 type Provider uint16
 
 const (
-	Redis Provider = 0
-	Rabbit Provider = 1
+	Redis    Provider = 0
+	RabbitMQ Provider = 1
+	ActiveMQ Provider = 2
+	PubSub	Provider = 3
+	SQS		Provider = 4
 )
 
 const BallChannelName = "ball_status"
@@ -27,11 +30,12 @@ const RemoteAddr = "redis-19098.c55.eu-central-1-1.ec2.cloud.redislabs.com:19098
 const LocalPass = ""
 const RemotePass = "q1w2e3r4"
 
-const RedisAddr = LocalAddr
-const RedisPass= LocalPass
+var RedisAddr = LocalAddr
+var RedisPass = LocalPass
 
 
-func init(){
+
+func getTransport(){
 
 	switch provider {
 	case Redis:
@@ -43,7 +47,10 @@ func init(){
 			MaxRetries: 0,
 		})
 		transport = redis.New(redis.WithClient(client))
-	case Rabbit:
+	case RabbitMQ:
+	case ActiveMQ:
+	case PubSub:
+	case SQS:
 		transport = nil
 	}
 }
@@ -58,11 +65,17 @@ func GetErrorChannel() <-chan error {
 	return transport.ErrChan()
 }
 func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
+	if transport == nil {
+		getTransport()
+	}
 	fmt.Printf("GetOutputChannel: %s\n", name)
 	return transport.Send(name), transport
 }
 
 func GetInputChannel(name string) (<-chan []byte, vice.Transport){
+	if transport == nil {
+		getTransport()
+	}
 	fmt.Printf("GetInputChannel: %s\n", name)
 	return transport.Receive(name), transport
 }

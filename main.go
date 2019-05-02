@@ -2,44 +2,43 @@ package main
 
 import (
 	"github.com/urfave/cli"
-	"flag"
-	"os"
 	"github.com/tikalk/go-distribution-workshop/commands"
+	"os"
 )
-var app cli.App
 
-func init(){
-	app = cli.App{
-		Name:     "go-distribution-workshop",
-		Version:  "1.0.0",
-	}
+// TODO add dependencies to both Project.dep, sh and bat build scripts
+
+func main()  {
+
+	app := cli.NewApp()
+
+	app.Name = "go-distribution-workshop"
+	app.Version = "1.0.0"
+	app.Email = "royp@tikalk.com"
+
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "redis-host",
+			Usage: "IP of Redis server",
 			Value: "127.0.0.1",
 		},
-		cli.StringFlag{
+		cli.IntFlag{
 			Name:  "redis-port",
-			Value: "6379",
+			Usage: "port of Redis server",
+			Value: 6379,
 		},
 	}
 
+
 	app.Commands = []cli.Command{
-		commands.PlayCommand,
+		commands.JoinCommand,
 		commands.ThrowCommand,
 		commands.SimulateCommand,
 		commands.DisplayCommand,
 
 	}
 
-
-}
-func main()  {
-
-
-
-	flag.Parse()
 	app.Run(os.Args)
 }
 
