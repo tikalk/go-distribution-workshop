@@ -11,7 +11,7 @@ import (
 	"github.com/tikalk/go-distribution-workshop/utils"
 )
 
-const kickThreshold = 4
+const kickThreshold = 6
 const kickVelocityThreshold = 4
 
 type Player struct {
@@ -68,7 +68,7 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 			select {
 			case <-time.After(time.Duration(5.0 + rand.Float64() * 6.0) * time.Second):
 
-				p.idleV = 0.2 + 0.4 * rand.Float64()
+				p.idleV = 0.5 + 0.5 * rand.Float64()
 				p.idleAngle = math.Pi * 2 * rand.Float64()
 				p.idleVx = math.Cos(p.idleAngle) * p.idleV
 				p.idleVy = math.Sin(p.idleAngle) * p.idleV
@@ -95,13 +95,14 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 		}
 	}()
 
-	ticker := time.NewTicker(5 * time.Second)
-
+	ticker := time.NewTicker(10 * time.Second)
 
 	go func() {
 
 		for {
 			select {
+
+
 				case ball = <-p.ballInput:
 					ticker.Stop()
 					distance := p.getDistanceToBall(ball)
@@ -125,8 +126,17 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 					p.ballOutput <- ball
 					reportDisplay(ball, displayChannel)
 
-				case <-ticker.C:
-					p.log("Waiting for the ball...\n")
+				case <-ticker.C:						// Initial delay before game starts
+				case <- time.After(30 * time.Second):	// Lost ball message recovery
+					if ball == nil {
+						p.log("Waiting for the ball...\n")
+					} else {
+						p.log("Seems like some player got killed with the ball, throwing another!")
+						p.ballOutput <- ball
+						reportDisplay(ball, displayChannel)
+					}
+
+					// TODO if holds last ball status - throw it!
 			}
 		}
 	}()
