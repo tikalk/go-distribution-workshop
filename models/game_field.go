@@ -15,7 +15,7 @@ type (
 	}
 )
 const cleanupInterval = 5 * time.Second
-const timeToDeclareDead = 15 * time.Second
+const timeToDeclareDead = 10 * time.Second
 
 func NewGameField() *GameField{
 	res := &GameField{Items: syncmap.Map{}}
