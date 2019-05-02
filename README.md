@@ -1,5 +1,8 @@
 # Go Workshop: Distributed MSA Soccer #
 
+## Abstract ##
+TBD
+
 ## Environment ##
 
 In order to get your hands dirty in this workshop, 
@@ -40,5 +43,7 @@ git clone git@github.com:tikalk/go-distribution-workshop.git
 ### GO IDE ###
 In this workshop we'll use [GoLand](https://www.jetbrains.com/go/).Feel free to use your preferred IDE if any.
  
+## Dependencies ## 
+
 ## Phases ##
 
