@@ -2,10 +2,12 @@
 
 ## Environment ##
 
-In order to get your hands dirty in this workshop, you'll have to install the following:
+In order to get your hands dirty in this workshop, 
+make sure you got the following prerequisites set up:
 * Redis server
 * GO SDK
 * Go IDE
+* GIT
 
 ### Redis Server ###
 
