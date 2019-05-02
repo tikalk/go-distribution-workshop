@@ -72,7 +72,6 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 				p.idleAngle = math.Pi * 2 * rand.Float64()
 				p.idleVx = math.Cos(p.idleAngle) * p.idleV
 				p.idleVy = math.Sin(p.idleAngle) * p.idleV
-				fmt.Printf("\nNew Velocity: %f\n", p.idleV)
 			}
 		}
 	}()
@@ -142,6 +141,11 @@ func (p *Player) getDistanceToBall(ball *Ball) float64 {
 }
 
 func (p *Player) runToBall(ball *Ball){
+
+	// TODO make view threshold (50) random so that a distant player sees that ball after a period of time
+
+	// once every N seconds - the player gets a longer view and can see the ball. Once saw the ball -
+	// he keeps the "long view" mode for a longer period
 
 	if ball != nil {
 		dist := p.getDistanceToBall(ball)
