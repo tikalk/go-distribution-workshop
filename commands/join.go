@@ -8,6 +8,7 @@ import (
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"strings"
+	"github.com/pkg/errors"
 )
 
 var JoinCommand = cli.Command{
@@ -33,16 +34,40 @@ var JoinCommand = cli.Command{
 }
 
 func joinGame(c *cli.Context) error {
+	playersFlag := c.String("players")
+	players := strings.Split(playersFlag, ",")
+
+	teamFlag := c.String("team")
+
+
+	if len(players) == 0 {
+		println("Al least one player must be specified")
+		return errors.New("Al least one player must be specified")
+	}
+
+	switch teamFlag {
+	case string(models.TeamBlue):
+	case string(models.TeamRed):
+	case string(models.TeamBoth):
+		break
+	default:
+		println("Illegal value  for --team flag. Must be one of {blue, red, both}")
+		return errors.New("Illegal value  for --team flag. Must be one of {blue, red, both}")
+
+	}
+
+
 	defer messaging.Stop()
 	setupRedis(c)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
-	playersFlag := c.String("players")
-	players := strings.Split(playersFlag, ",")
 
-	teamFlag := c.String("team")
+
+
+
+
 
 	go apps.JoinGame(players, models.Team(teamFlag), wg)
 
