@@ -28,18 +28,6 @@ const EnergyLoss = 0.96
 const GlobalDumping = 0.98
 const g = 0.098
 
-func (b *Ball) GetDisplayStatus() *DisplayStatus{
-	res := &DisplayStatus{}
-	res.X = b.X
-	res.Y = b.Y
-	res.Z = b.Z
-	res.ItemType = TypeBall
-	res.LastUpdated = time.Now()
-	res.ItemID = b.HolderID
-	res.TeamID = b.HolderTeam
-
-	return res
-}
 
 func (b *Ball) GetSurfaceVelocity() float64{
 	return math.Sqrt(math.Pow(b.Vx, 2) + math.Pow(b.Vy, 2))
