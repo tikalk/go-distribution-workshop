@@ -43,7 +43,7 @@ func LaunchDisplay(port int, externalWaitGroup *sync.WaitGroup){
 }
 
 func getDisplayChannel() <- chan *models.DisplayStatus  {
-	rawInput, _ := messaging.GetInputChannel(messaging.DisplayChannelName)
+	rawInput := messaging.GetInputChannel(messaging.DisplayChannelName)
 	res := make(chan *models.DisplayStatus)
 
 	// Display channel population, executed in function closure

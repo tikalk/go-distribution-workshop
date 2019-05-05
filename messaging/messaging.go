@@ -53,20 +53,20 @@ func getTransport() vice.Transport{
 	return transport
 }
 
-func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
+func GetOutputChannel(name string) chan<- []byte{
 	if transport == nil {
 		getTransport()
 	}
 	fmt.Printf("GetOutputChannel: %s\n", name)
-	return transport.Send(name), transport
+	return transport.Send(name)
 }
 
-func GetInputChannel(name string) (<-chan []byte, vice.Transport){
+func GetInputChannel(name string) <-chan []byte{
 	if transport == nil {
 		getTransport()
 	}
 	fmt.Printf("GetInputChannel: %s\n", name)
-	return transport.Receive(name), transport
+	return transport.Receive(name)
 }
 
 

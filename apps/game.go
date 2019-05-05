@@ -88,7 +88,7 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 }
 
 func getDisplayOutputChannel() chan <- *models.DisplayStatus  {
-	rawOutput, _ := messaging.GetOutputChannel(messaging.DisplayChannelName)
+	rawOutput := messaging.GetOutputChannel(messaging.DisplayChannelName)
 	res := make(chan *models.DisplayStatus)
 
 	// Display channel population, executed in function closure

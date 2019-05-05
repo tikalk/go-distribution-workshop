@@ -214,7 +214,7 @@ func (p *Player) applyKick(ball *Ball){
 }
 
 func getBallInputChannel() <- chan *Ball {
-	rawInput, _ := messaging.GetInputChannel(messaging.BallChannelName)
+	rawInput := messaging.GetInputChannel(messaging.BallChannelName)
 	res := make(chan *Ball)
 
 	// Ball channel population, executed in function closure
@@ -231,7 +231,7 @@ func getBallInputChannel() <- chan *Ball {
 }
 
 func getBallOutputChannel() chan <- *Ball {
-	rawOutput, _ := messaging.GetOutputChannel(messaging.BallChannelName)
+	rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
 	res := make(chan *Ball)
 
 	// Ball channel population, executed in function closure
