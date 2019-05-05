@@ -128,14 +128,21 @@ func (p *Player) runToBall(ball *Ball){
 			p.X += (ball.X - p.X) * vel
 			p.Y += (ball.Y - p.Y) * vel
 		} else {
-			utils.ApplyVelocityComponent(&p.X, &p.idleVx, 1, 1)
-			utils.ApplyVelocityComponent(&p.Y, &p.idleVy, 1, 1)
+			p.idleMovement()
 		}
+		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+
+	} else{
+		p.idleMovement()
+		p.log(fmt.Sprintf("Current Position: (%f, %f), No ball...", p.X, p.Y))
+
 	}
 
-	p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+}
 
-
+func (p *Player)idleMovement() {
+	utils.ApplyVelocityComponent(&p.X, &p.idleVx, 1, 1)
+	utils.ApplyVelocityComponent(&p.Y, &p.idleVy, 1, 1)
 }
 
 func (p *Player) log(message string) {
