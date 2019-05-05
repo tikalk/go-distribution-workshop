@@ -47,15 +47,9 @@ func (p *Player) GetDisplayStatus() *DisplayStatus{
 	return res
 }
 
-func reportDisplay(item DisplayStatusProvider, channel chan <- *DisplayStatus){
-	if channel == nil || item == nil {
-		return
-	}
+func (p *Player) Activate(wg sync.WaitGroup) {
 
-	channel <- item.GetDisplayStatus()
-}
-
-func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGroup) {
+	// TODO Challenge: Receive a display input channel, use it for display updates
 
 	p.ballInput = getBallInputChannel()
 	p.ballOutput = getBallOutputChannel()
@@ -86,14 +80,7 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 		}
 	}()
 
-	go func() {
-		for {
-			select {
-			case <-time.After(200 * time.Millisecond):
-				reportDisplay(p, displayChannel)
-			}
-		}
-	}()
+	// TODO Challenge: start display reporting on a constant cycle
 
 	ticker := time.NewTicker(10 * time.Second)
 
@@ -124,7 +111,7 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 					ball.LastUpdated = time.Now()
 
 					p.ballOutput <- ball
-					reportDisplay(ball, displayChannel)
+					// TODO Challenge: report display of the ball
 
 				case <-ticker.C:						// Initial delay before game starts
 				case <- time.After(30 * time.Second):	// Lost ball message recovery
@@ -133,10 +120,9 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 					} else {
 						p.log("Seems like some player got killed with the ball, throwing another!")
 						p.ballOutput <- ball
-						reportDisplay(ball, displayChannel)
+						// TODO Challenge: report display of the ball
 					}
 
-					// TODO if holds last ball status - throw it!
 			}
 		}
 	}()

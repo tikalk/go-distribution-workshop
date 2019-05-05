@@ -23,12 +23,8 @@ const (
 const BallChannelName = "ball_status"
 const DisplayChannelName = "display"
 
-const RedisDB = "go-workshop"
-
 const LocalAddr = "127.0.0.1:6379"
-const RemoteAddr = "redis-19098.c55.eu-central-1-1.ec2.cloud.redislabs.com:19098"
 const LocalPass = ""
-const RemotePass = "q1w2e3r4"
 
 var RedisAddr = LocalAddr
 var RedisPass = LocalPass

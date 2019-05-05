@@ -14,12 +14,13 @@ import (
 func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGroup) {
 	defer messaging.Stop()
 
-	displayChannel := getDisplayOutputChannel()
 	rand.Seed(time.Now().UnixNano())
 
 	numPlayers := len(players)
 	wg := sync.WaitGroup{}
 	wg.Add(numPlayers)
+
+	// TODO Challenge: get a display input channel here
 
 
 	for i := 0; i < numPlayers; i++ {
@@ -38,7 +39,9 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 			player.TeamID = models.TeamBlue
 		}
 		fmt.Printf("Added player %s\n", players[i])
-		player.Activate(displayChannel, wg)
+
+		// TODO Challenge: pass display input channel to the player
+		player.Activate(wg)
 
 	}
 
@@ -55,10 +58,11 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 	throwBall()
 
 
-	displayChannel := getDisplayOutputChannel()
 	rand.Seed(time.Now().UnixNano())
 	wg := sync.WaitGroup{}
 	wg.Add(numPlayers)
+
+	// TODO Challenge: get a display input channel here
 
 	fmt.Println("Adding players...")
 
@@ -79,7 +83,8 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 			player.TeamID = models.TeamBlue
 		}
 
-		player.Activate(displayChannel, wg)
+		// TODO Challenge: pass display input channel to the player
+		player.Activate(wg)
 	}
 
 	wg.Wait()
@@ -87,22 +92,6 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 		externalWaitGroup.Done()
 	}
 
-}
-
-func getDisplayOutputChannel() chan <- *models.DisplayStatus  {
-	rawOutput, _ := messaging.GetOutputChannel(messaging.DisplayChannelName)
-	res := make(chan *models.DisplayStatus)
-
-	// Display channel population, executed in function closure
-	go func(){
-		for bs := range res {
-			val, err := json.Marshal(bs)
-			if err == nil {
-				rawOutput <- val
-			}
-		}
-	}()
-	return res
 }
 
 func throwBall(){
