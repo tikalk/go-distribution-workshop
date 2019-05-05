@@ -1,13 +1,11 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 	"math"
 	"math/rand"
 	"sync"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/tikalk/go-distribution-workshop/utils"
 )
 
@@ -24,8 +22,7 @@ type Player struct {
 	MaxVelocity float64
 	LastKick time.Time
 
-	ballInput <-chan *Ball
-	ballOutput chan<- *Ball
+	ballChannel chan *Ball
 
 	idleV     	float64
 	idleVx    	float64
@@ -36,8 +33,8 @@ type Player struct {
 
 func (p *Player) Activate(wg sync.WaitGroup) {
 
-	p.ballInput = getBallInputChannel()
-	p.ballOutput = getBallOutputChannel()
+	p.ballChannel = GetBallChannel()
+
 
 	var ball *Ball
 
@@ -74,10 +71,9 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 		for {
 			select {
 
-				case ball = <-p.ballInput:
+				case ball = <-p.ballChannel:
 					ticker.Stop()
 					distance := p.getDistanceToBall(ball)
-
 					if distance < kickThreshold &&
 						ball.GetSurfaceVelocity() < kickVelocityThreshold &&
 						time.Now().Sub(ball.LastKick) > 1*time.Second {
@@ -85,7 +81,6 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 						p.applyKick(ball)
 
 					} else {
-
 						time.Sleep(20 * time.Millisecond)
 						ball.ApplyKinematics()
 
@@ -94,7 +89,7 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 					p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
 					ball.LastUpdated = time.Now()
 
-					p.ballOutput <- ball
+					p.ballChannel <- ball
 
 				case <-ticker.C:						// Initial delay before game starts
 					if ball == nil {
@@ -167,38 +162,6 @@ func (p *Player) applyKick(ball *Ball){
 	p.log(fmt.Sprintf("\nKick!!! (angle: %d degrees, velocity: %f)\n", int(180 * angle / math.Pi), v))
 }
 
-func getBallInputChannel() <- chan *Ball {
-	rawInput := messaging.GetInputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
-
-	// Ball channel population, executed in function closure
-	go func(){
-		for val := range rawInput {
-			bs := &Ball{}
-			err := json.Unmarshal(val, bs)
-			if err == nil {
-				res <- bs
-			}
-		}
-	}()
-	return res
-}
-
-func getBallOutputChannel() chan <- *Ball {
-	rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
-
-	// Ball channel population, executed in function closure
-	go func(){
-		for bs := range res {
-			val, err := json.Marshal(bs)
-			if err == nil {
-				rawOutput <- val
-			}
-		}
-	}()
-	return res
-}
 
 
 

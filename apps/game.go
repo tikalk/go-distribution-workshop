@@ -2,11 +2,9 @@ package apps
 
 import (
 	"time"
-	"encoding/json"
 	"math/rand"
 	"sync"
 	"fmt"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/tikalk/go-distribution-workshop/models"
 	"github.com/satori/go.uuid"
 )
@@ -102,18 +100,11 @@ func ThrowBall(x, y float64){
 	}
 
 	fmt.Println("Throwing ball!")
-	output := messaging.GetOutputChannel(messaging.BallChannelName)
+	output := models.GetBallChannel()
 
 	bs := &models.Ball{X: x, Y: y, Vx: 0, Vy: 0, Vz: 0, Z: 50}
 	bs.LastUpdated = time.Now()
-
-
-	bsSer, err := json.Marshal(bs)
-	if err != nil {
-		panic(err)
-	}
-
-	output <- bsSer
+	output <- bs
 
 
 }

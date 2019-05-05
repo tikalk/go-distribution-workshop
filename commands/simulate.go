@@ -26,8 +26,6 @@ var SimulateCommand = cli.Command{
 
 func simulate(c *cli.Context) error {
 
-	setupRedis(c)
-
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 

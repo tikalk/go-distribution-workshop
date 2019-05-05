@@ -33,7 +33,6 @@ var JoinCommand = cli.Command{
 }
 
 func joinGame(c *cli.Context) error {
-	setupRedis(c)
 
 	playersFlag := c.String("players")
 	players := strings.Split(playersFlag, ",")
