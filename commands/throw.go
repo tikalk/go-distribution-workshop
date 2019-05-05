@@ -29,6 +29,9 @@ var ThrowCommand = cli.Command{
 
 func throwBall(c *cli.Context) error {
 
+	setupRedis(c)
+
+
 	x := c.Int("x")
 	y := c.Int("y")
 
