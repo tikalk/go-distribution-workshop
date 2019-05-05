@@ -50,7 +50,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 
 func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 
-	throwBall()
+	ThrowBall(-1, -1)
 
 
 	displayChannel := getDisplayOutputChannel()
@@ -103,15 +103,29 @@ func getDisplayOutputChannel() chan <- *models.DisplayStatus  {
 	return res
 }
 
-func throwBall(){
-	fmt.Println("Throwing ball!")
-	output, _ := messaging.GetOutputChannel(messaging.BallChannelName)
+func ThrowBall(x, y float64){
+	rand.Seed(time.Now().UnixNano())
 
-	bs := &models.Ball{X: 8, Y: 2, Vx: 0, Vy: 0, Vz: 0, Z: 50}
+	if x == -1 {
+		x = rand.Float64() * 100.0
+	}
+	if y == -1 {
+		y = rand.Float64() * 100.0
+	}
+
+	fmt.Println("Throwing ball!")
+	output := messaging.GetOutputChannel(messaging.BallChannelName)
+
+	bs := &models.Ball{X: x, Y: y, Vx: 0, Vy: 0, Vz: 0, Z: 50}
 	bs.LastUpdated = time.Now()
+
+
 	bsSer, err := json.Marshal(bs)
 	if err != nil {
 		panic(err)
 	}
+
 	output <- bsSer
+
+
 }
