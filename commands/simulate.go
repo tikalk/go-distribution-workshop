@@ -3,7 +3,6 @@ package commands
 import (
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/urfave/cli"
 	"time"
 	"fmt"
@@ -29,7 +28,6 @@ var SimulateCommand = cli.Command{
 	}
 
 func simulate(c *cli.Context) error {
-	defer messaging.Stop()
 	setupRedis(c)
 
 	wg := &sync.WaitGroup{}

@@ -64,15 +64,18 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg sync.WaitGro
 
 
 	go func() {
+		nextDelay := 0 * time.Second
 		for {
 			select {
-			case <-time.After(time.Duration(5.0 + rand.Float64() * 6.0) * time.Second):
+			case <-time.After(nextDelay):
 
 				p.idleV = 0.5 + 0.5 * rand.Float64()
 				p.idleAngle = math.Pi * 2 * rand.Float64()
 				p.idleVx = math.Cos(p.idleAngle) * p.idleV
 				p.idleVy = math.Sin(p.idleAngle) * p.idleV
 			}
+
+			nextDelay = time.Duration(4.0 + rand.Float64() * 5.0) * time.Second
 		}
 	}()
 
@@ -163,12 +166,21 @@ func (p *Player) runToBall(ball *Ball){
 			p.X += (ball.X - p.X) * vel
 			p.Y += (ball.Y - p.Y) * vel
 		} else {
-
-			utils.ApplyVelocityComponent(&p.X, &p.idleVx, 1, 1)
-			utils.ApplyVelocityComponent(&p.Y, &p.idleVy, 1, 1)
+			p.idleMovement()
 		}
+		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+
+	} else{
+		p.idleMovement()
+		p.log(fmt.Sprintf("Current Position: (%f, %f), No ball...", p.X, p.Y))
+
 	}
 
+}
+
+func (p *Player)idleMovement() {
+	utils.ApplyVelocityComponent(&p.X, &p.idleVx, 1, 1)
+	utils.ApplyVelocityComponent(&p.Y, &p.idleVy, 1, 1)
 }
 
 func (p *Player) log(message string) {

@@ -12,7 +12,6 @@ import (
 )
 
 func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGroup) {
-	defer messaging.Stop()
 
 	displayChannel := getDisplayOutputChannel()
 	rand.Seed(time.Now().UnixNano())
@@ -50,7 +49,6 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 }
 
 func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
-	defer messaging.Stop()
 
 	throwBall()
 

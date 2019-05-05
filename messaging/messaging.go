@@ -31,36 +31,28 @@ var RedisPass = LocalPass
 
 
 
-func getTransport(){
-
-	switch provider {
-	case Redis:
-		client := goredis.NewClient(&goredis.Options{
-			Network:    "tcp",
-			Addr:       RedisAddr,
-			Password:   RedisPass,
-			DB:         0,
-			MaxRetries: 0,
-		})
-		transport = redis.New(redis.WithClient(client))
-	case RabbitMQ:
-	case ActiveMQ:
-	case PubSub:
-	case SQS:
-		transport = nil
+func getTransport() vice.Transport{
+	if transport == nil {
+		switch provider {
+		case Redis:
+			client := goredis.NewClient(&goredis.Options{
+				Network:    "tcp",
+				Addr:       RedisAddr,
+				Password:   RedisPass,
+				DB:         0,
+				MaxRetries: 0,
+			})
+			transport = redis.New(redis.WithClient(client))
+		case RabbitMQ:
+		case ActiveMQ:
+		case PubSub:
+		case SQS:
+			transport = nil
+		}
 	}
+	return transport
 }
 
-func Stop(){
-	/*
-	if transport != nil {
-		transport.Stop()
-		<-transport.Done()
-	}*/
-}
-func GetErrorChannel() <-chan error {
-	return transport.ErrChan()
-}
 func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
 	if transport == nil {
 		getTransport()

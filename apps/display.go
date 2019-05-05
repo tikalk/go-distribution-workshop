@@ -11,7 +11,6 @@ import (
 )
 
 func LaunchDisplay(port int, externalWaitGroup *sync.WaitGroup){
-	defer messaging.Stop()
 
 	displayInput := getDisplayChannel()
 
