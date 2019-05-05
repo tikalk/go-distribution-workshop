@@ -57,16 +57,6 @@ func (b *Ball) applyKinematicsIteration(timeDiff, iterations float64){
 
 }
 
-var ballChannel chan *Ball
-
-func GetBallChannel() chan *Ball {
-	if ballChannel == nil {
-		ballChannel = make(chan *Ball, 1024)
-	}
-
-	return ballChannel
-}
-
 
 
 

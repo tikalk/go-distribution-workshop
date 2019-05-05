@@ -33,8 +33,7 @@ type Player struct {
 
 func (p *Player) Activate(wg sync.WaitGroup) {
 
-	p.ballChannel = GetBallChannel()
-
+	// TODO Challenge: Get ball channel
 
 	var ball *Ball
 
@@ -71,25 +70,7 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 		for {
 			select {
 
-				case ball = <-p.ballChannel:
-					ticker.Stop()
-					distance := p.getDistanceToBall(ball)
-					if distance < kickThreshold &&
-						ball.GetSurfaceVelocity() < kickVelocityThreshold &&
-						time.Now().Sub(ball.LastKick) > 1*time.Second {
-
-						p.applyKick(ball)
-
-					} else {
-						time.Sleep(20 * time.Millisecond)
-						ball.ApplyKinematics()
-
-					}
-
-					p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
-					ball.LastUpdated = time.Now()
-
-					p.ballChannel <- ball
+				// TODO Challenge: Continuously pull messages from it, update ball and kick, then put message bach
 
 				case <-ticker.C:						// Initial delay before game starts
 					if ball == nil {

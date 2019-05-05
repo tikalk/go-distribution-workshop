@@ -100,11 +100,12 @@ func ThrowBall(x, y float64){
 	}
 
 	fmt.Println("Throwing ball!")
-	output := models.GetBallChannel()
+
 
 	bs := &models.Ball{X: x, Y: y, Vx: 0, Vy: 0, Vz: 0, Z: 50}
 	bs.LastUpdated = time.Now()
-	output <- bs
+
+	// TODO Challenge: Put initial ball message to channel
 
 
 }
