@@ -3,11 +3,7 @@ package commands
 import (
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/urfave/cli"
-	"time"
-	"fmt"
-	"github.com/mgutz/ansi"
 )
 
 var SimulateCommand = cli.Command{
@@ -18,7 +14,7 @@ var SimulateCommand = cli.Command{
 			cli.IntFlag{
 				Name:  "players",
 				Usage: "total number of players - distributed evenly to teams",
-				Value: 4,
+				Value: 1,
 			},
 			cli.IntFlag{
 				Name:  "port",
@@ -29,21 +25,14 @@ var SimulateCommand = cli.Command{
 	}
 
 func simulate(c *cli.Context) error {
-	defer messaging.Stop()
-	setupRedis(c)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 
 
-	port := c.Int("port")
-	go apps.LaunchDisplay(port, wg)
-
 	players := c.Int("players")
-	go apps.ExecuteSimulation(players, wg)
 
-	time.Sleep(200 * time.Millisecond)
-	fmt.Printf(ansi.Color("\n\nDisplay server launched successfully on port %d\n", "green"), port)
+	go apps.ExecuteSimulation(players, wg)
 
 	wg.Wait()
 

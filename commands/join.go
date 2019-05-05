@@ -4,7 +4,6 @@ import (
 	"github.com/urfave/cli"
 	"github.com/tikalk/go-distribution-workshop/models"
 	"fmt"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"strings"
@@ -56,9 +55,6 @@ func joinGame(c *cli.Context) error {
 
 	}
 
-
-	defer messaging.Stop()
-	setupRedis(c)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)

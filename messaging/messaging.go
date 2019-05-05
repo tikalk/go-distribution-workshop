@@ -1,27 +1,13 @@
 package messaging
 
 import (
-	"github.com/matryer/vice/queues/redis"
-	goredis "github.com/go-redis/redis"
-	"github.com/matryer/vice"
 	"fmt"
 )
 
-var transport vice.Transport
-var provider = Redis
-
-type Provider uint16
-
-const (
-	Redis    Provider = 0
-	RabbitMQ Provider = 1
-	ActiveMQ Provider = 2
-	PubSub	Provider = 3
-	SQS		Provider = 4
-)
 
 const BallChannelName = "ball_status"
-const DisplayChannelName = "display"
+
+const defaultChannelBuffer = 1024
 
 const LocalAddr = "127.0.0.1:6379"
 const LocalPass = ""
@@ -30,51 +16,40 @@ var RedisAddr = LocalAddr
 var RedisPass = LocalPass
 
 
+// TODO Challenge get a package-internal transport object here
 
-func getTransport(){
+var channels map[string]chan []byte
 
-	switch provider {
-	case Redis:
-		client := goredis.NewClient(&goredis.Options{
-			Network:    "tcp",
-			Addr:       RedisAddr,
-			Password:   RedisPass,
-			DB:         0,
-			MaxRetries: 0,
-		})
-		transport = redis.New(redis.WithClient(client))
-	case RabbitMQ:
-	case ActiveMQ:
-	case PubSub:
-	case SQS:
-		transport = nil
+func init(){
+	channels = make(map[string]chan []byte)
+}
+
+func getChannel(name string) chan []byte {
+	if _, ok := channels[name]; !ok {
+		fmt.Printf("creating channel %s with size %d\n", name, defaultChannelBuffer)
+		channels[name] = make(chan []byte, defaultChannelBuffer)
 	}
+	return channels[name]
 }
 
-func Stop(){
-	/*
-	if transport != nil {
-		transport.Stop()
-		<-transport.Done()
-	}*/
-}
-func GetErrorChannel() <-chan error {
-	return transport.ErrChan()
-}
-func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
-	if transport == nil {
-		getTransport()
-	}
+
+// Used mainly to limit access direction on channel
+func GetOutputChannel(name string) chan<- []byte {
+
 	fmt.Printf("GetOutputChannel: %s\n", name)
-	return transport.Send(name), transport
+
+	// TODO Challenge: Get a Publisher channel here via transport.Send
+	return getChannel(name)
+
 }
 
-func GetInputChannel(name string) (<-chan []byte, vice.Transport){
-	if transport == nil {
-		getTransport()
-	}
+// Used mainly to limit access direction on channel
+func GetInputChannel(name string) <-chan []byte {
+
 	fmt.Printf("GetInputChannel: %s\n", name)
-	return transport.Receive(name), transport
+
+	// TODO Challenge: Get a Consumer channel here via transport.Send
+	return getChannel(name)
 }
 
 

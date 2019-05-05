@@ -49,8 +49,6 @@ func (p *Player) GetDisplayStatus() *DisplayStatus{
 
 func (p *Player) Activate(wg sync.WaitGroup) {
 
-	// TODO Challenge: Receive a display input channel, use it for display updates
-
 	p.ballInput = getBallInputChannel()
 	p.ballOutput = getBallOutputChannel()
 
@@ -58,14 +56,16 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 
 
 	go func() {
+		nextDelay := 0 * time.Second
 		for {
 			select {
-			case <-time.After(time.Duration(5.0 + rand.Float64() * 6.0) * time.Second):
+			case <-time.After(nextDelay):
 
 				p.idleV = 0.5 + 0.5 * rand.Float64()
 				p.idleAngle = math.Pi * 2 * rand.Float64()
 				p.idleVx = math.Cos(p.idleAngle) * p.idleV
 				p.idleVy = math.Sin(p.idleAngle) * p.idleV
+				nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
 			}
 		}
 	}()
@@ -80,15 +80,12 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 		}
 	}()
 
-	// TODO Challenge: start display reporting on a constant cycle
-
 	ticker := time.NewTicker(10 * time.Second)
 
 	go func() {
 
 		for {
 			select {
-
 
 				case ball = <-p.ballInput:
 					ticker.Stop()
@@ -111,16 +108,10 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 					ball.LastUpdated = time.Now()
 
 					p.ballOutput <- ball
-					// TODO Challenge: report display of the ball
 
 				case <-ticker.C:						// Initial delay before game starts
-				case <- time.After(30 * time.Second):	// Lost ball message recovery
 					if ball == nil {
 						p.log("Waiting for the ball...\n")
-					} else {
-						p.log("Seems like some player got killed with the ball, throwing another!")
-						p.ballOutput <- ball
-						// TODO Challenge: report display of the ball
 					}
 
 			}
@@ -149,11 +140,13 @@ func (p *Player) runToBall(ball *Ball){
 			p.X += (ball.X - p.X) * vel
 			p.Y += (ball.Y - p.Y) * vel
 		} else {
-
 			utils.ApplyVelocityComponent(&p.X, &p.idleVx, 1, 1)
 			utils.ApplyVelocityComponent(&p.Y, &p.idleVy, 1, 1)
 		}
 	}
+
+	p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+
 
 }
 
@@ -188,7 +181,7 @@ func (p *Player) applyKick(ball *Ball){
 }
 
 func getBallInputChannel() <- chan *Ball {
-	rawInput, _ := messaging.GetInputChannel(messaging.BallChannelName)
+	rawInput := messaging.GetInputChannel(messaging.BallChannelName)
 	res := make(chan *Ball)
 
 	// Ball channel population, executed in function closure
@@ -205,7 +198,7 @@ func getBallInputChannel() <- chan *Ball {
 }
 
 func getBallOutputChannel() chan <- *Ball {
-	rawOutput, _ := messaging.GetOutputChannel(messaging.BallChannelName)
+	rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
 	res := make(chan *Ball)
 
 	// Ball channel population, executed in function closure

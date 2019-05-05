@@ -1,6 +1,9 @@
 package commands
 
-import "github.com/urfave/cli"
+import (
+	"github.com/urfave/cli"
+	"github.com/tikalk/go-distribution-workshop/apps"
+)
 
 var ThrowCommand = cli.Command{
 	Name:  "throw",
@@ -18,14 +21,23 @@ var ThrowCommand = cli.Command{
 			Value: 5,
 		},
 		cli.BoolFlag{
-			Name:  "manual_pos",
+			Name:  "manual",
 			Usage: "use specific coordinates to place the ball. Otherwise a random position will be used",
 		},
 	},
 }
 
 func throwBall(c *cli.Context) error {
-	setupRedis(c)
 
+	x := c.Int("x")
+	y := c.Int("y")
+
+	manual := c.Bool("manual")
+	if !manual {
+		x = -1
+		y = -1
+	}
+
+	apps.ThrowBall(float64(x), float64(y))
 	return nil
 }
