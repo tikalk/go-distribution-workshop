@@ -34,18 +34,6 @@ type Player struct {
 
 }
 
-func (p *Player) GetDisplayStatus() *DisplayStatus{
-	res := &DisplayStatus{}
-	res.X = p.X
-	res.Y = p.Y
-	res.ItemID = p.ID
-	res.ItemLabel = p.Name
-	res.TeamID = p.TeamID
-	res.ItemType = TypePlayer
-	res.LastUpdated = time.Now()
-
-	return res
-}
 
 func (p *Player) Activate(wg sync.WaitGroup) {
 
