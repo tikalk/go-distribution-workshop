@@ -21,7 +21,7 @@ func LaunchDisplay(port int, externalWaitGroup *sync.WaitGroup){
 		http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	}()
 
-	// TODO Challange: read from display channel and update game field
+	// TODO Challenge: read from display channel and update game field
 
 
 	if externalWaitGroup != nil {
