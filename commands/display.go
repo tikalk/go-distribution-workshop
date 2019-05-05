@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/urfave/cli"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"fmt"
@@ -24,7 +23,6 @@ var DisplayCommand = cli.Command{
 }
 
 func display(c *cli.Context) error {
-	defer messaging.Stop()
 
 	setupRedis(c)
 

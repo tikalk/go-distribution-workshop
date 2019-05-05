@@ -51,16 +51,6 @@ func getTransport(){
 	}
 }
 
-func Stop(){
-	/*
-	if transport != nil {
-		transport.Stop()
-		<-transport.Done()
-	}*/
-}
-func GetErrorChannel() <-chan error {
-	return transport.ErrChan()
-}
 func GetOutputChannel(name string) (chan<- []byte, vice.Transport){
 	if transport == nil {
 		getTransport()

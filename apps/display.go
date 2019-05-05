@@ -4,12 +4,10 @@ import (
 
 	"net/http"
 	"sync"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"fmt"
 )
 
 func LaunchDisplay(port int, externalWaitGroup *sync.WaitGroup){
-	defer messaging.Stop()
 
 
 	go func(){
