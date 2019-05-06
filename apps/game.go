@@ -17,7 +17,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 	rand.Seed(time.Now().UnixNano())
 
 	numPlayers := len(players)
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
 
@@ -55,7 +55,7 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 
 	displayChannel := getDisplayOutputChannel()
 	rand.Seed(time.Now().UnixNano())
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
 	fmt.Println("Adding players...")
