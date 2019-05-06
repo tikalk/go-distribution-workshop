@@ -51,10 +51,7 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 		}
 	}()
 
-
-
 	go p.mainLifeCycle(wg)
-
 
 }
 
