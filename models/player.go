@@ -22,6 +22,7 @@ type Player struct {
 	MaxVelocity float64
 	LastKick time.Time
 
+	ball *Ball
 	ballChannel chan *Ball
 
 	idleV     	float64
@@ -35,98 +36,94 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 
 	p.ballChannel = GetBallChannel()
 
-
-	var ball *Ball
-
-
-	go func() {
-		nextDelay := 0 * time.Second
-		for {
-			select {
-			case <-time.After(nextDelay):
-
-				p.idleV = 0.5 + 0.5 * rand.Float64()
-				p.idleAngle = math.Pi * 2 * rand.Float64()
-				p.idleVx = math.Cos(p.idleAngle) * p.idleV
-				p.idleVy = math.Sin(p.idleAngle) * p.idleV
-				nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
-			}
-		}
-	}()
+	go p.setIdleKinematics()
 
 	// Closing distance to ball
 	go func() {
 		for {
 			select {
 			case <-time.After(200 * time.Millisecond):
-				p.runToBall(ball)
+				p.runToBall()
 			}
 		}
 	}()
 
+	go p.mainLifeCycle(wg)
+
+}
+
+func (p *Player) setIdleKinematics() {
+	nextDelay := 0 * time.Second
+	for {
+		select {
+		case <-time.After(nextDelay):
+
+			p.idleV = 0.5 + 0.5 * rand.Float64()
+			p.idleAngle = math.Pi * 2 * rand.Float64()
+			p.idleVx = math.Cos(p.idleAngle) * p.idleV
+			p.idleVy = math.Sin(p.idleAngle) * p.idleV
+			nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
+		}
+	}
+}
+
+func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
 	ticker := time.NewTicker(10 * time.Second)
 
-	go func() {
+	for {
+		select {
 
-		for {
-			select {
+		case p.ball = <-p.ballChannel:
+			ticker.Stop()
+			distance := p.getDistanceToBall(p.ball)
+			if distance < kickThreshold &&
+				p.ball.GetSurfaceVelocity() < kickVelocityThreshold &&
+				time.Now().Sub(p.ball.LastKick) > 1*time.Second {
 
-				case ball = <-p.ballChannel:
-					ticker.Stop()
-					distance := p.getDistanceToBall(ball)
-					if distance < kickThreshold &&
-						ball.GetSurfaceVelocity() < kickVelocityThreshold &&
-						time.Now().Sub(ball.LastKick) > 1*time.Second {
+				p.applyKick(p.ball)
 
-						p.applyKick(ball)
-
-					} else {
-						time.Sleep(20 * time.Millisecond)
-						ball.ApplyKinematics()
-
-					}
-
-					p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
-					ball.LastUpdated = time.Now()
-
-					p.ballChannel <- ball
-
-				case <-ticker.C:						// Initial delay before game starts
-					if ball == nil {
-						p.log("Waiting for the ball...\n")
-					}
+			} else {
+				time.Sleep(20 * time.Millisecond)
+				p.ball.ApplyKinematics()
 
 			}
+
+			p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, p.ball.X, p.ball.Y))
+			p.ball.LastUpdated = time.Now()
+
+			p.ballChannel <- p.ball
+
+		case <-ticker.C:						// Initial delay before game starts
+			if p.ball == nil {
+				p.log("Waiting for the ball...\n")
+			}
+
 		}
-
-		wg.Done()
-	}()
-
-
-
+	}
+	wg.Done()
 }
 
 func (p *Player) getDistanceToBall(ball *Ball) float64 {
 	return math.Sqrt(math.Pow(p.X-ball.X, 2) + math.Pow(p.Y-ball.Y, 2))
 }
 
-func (p *Player) runToBall(ball *Ball){
+func (p *Player) runToBall(){
 
 	// TODO make view threshold (50) random so that a distant player sees that ball after a period of time
 
 	// once every N seconds - the player gets a longer view and can see the ball. Once saw the ball -
 	// he keeps the "long view" mode for a longer period
 
-	if ball != nil {
-		dist := p.getDistanceToBall(ball)
+	if p.ball != nil {
+		dist := p.getDistanceToBall(p.ball)
 		if dist < 50 && time.Now().Sub(p.LastKick) > 2 * time.Second{
 			vel := 0.05 + rand.Float64() * p.MaxVelocity
-			p.X += (ball.X - p.X) * vel
-			p.Y += (ball.Y - p.Y) * vel
+			p.X += (p.ball.X - p.X) * vel
+			p.Y += (p.ball.Y - p.Y) * vel
 		} else {
 			p.idleMovement()
 		}
-		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, p.ball.X, p.ball.Y))
 
 	} else{
 		p.idleMovement()
