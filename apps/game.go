@@ -17,8 +17,6 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
-	// TODO Challenge: get a display input channel here
-
 
 	for i := 0; i < numPlayers; i++ {
 		u2 := uuid.NewV4()
@@ -37,7 +35,6 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 		}
 		fmt.Printf("Added player %s\n", players[i])
 
-		// TODO Challenge: pass display input channel to the player
 		player.Activate(wg)
 
 	}
@@ -57,7 +54,6 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
-	// TODO Challenge: get a display input channel here
 
 	fmt.Println("Adding players...")
 
@@ -78,7 +74,6 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 			player.TeamID = models.TeamBlue
 		}
 
-		// TODO Challenge: pass display input channel to the player
 		player.Activate(wg)
 	}
 
