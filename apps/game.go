@@ -78,7 +78,6 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 			player.TeamID = models.TeamBlue
 		}
 
-		// TODO Challenge: pass display input channel to the player
 		player.Activate(wg)
 	}
 	wg.Wait()
