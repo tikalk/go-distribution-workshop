@@ -29,7 +29,7 @@ func simulate(c *cli.Context) error {
 	setupRedis(c)
 
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(1)
 
 
 	players := c.Int("players")

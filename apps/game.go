@@ -16,7 +16,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 	rand.Seed(time.Now().UnixNano())
 
 	numPlayers := len(players)
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
 	// TODO Challenge: get a display input channel here
@@ -56,7 +56,7 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 	ThrowBall(-1, -1)
 
 	rand.Seed(time.Now().UnixNano())
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
 	wg.Add(numPlayers)
 
 	// TODO Challenge: get a display input channel here
