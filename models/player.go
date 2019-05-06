@@ -23,7 +23,7 @@ type Player struct {
 	LastKick time.Time
 
 	ball *Ball
-	ballChannel chan *Ball
+	ballChannel chan *Ball	// TODO Challenge: Change to two unidirectional channels
 
 	idleV     	float64
 	idleVx    	float64
@@ -34,7 +34,7 @@ type Player struct {
 
 func (p *Player) Activate(wg *sync.WaitGroup) {
 
-	p.ballChannel = GetBallChannel()
+	p.ballChannel = GetBallChannel() // TODO Challenge: init two different channels. Input and Output
 
 	go p.setIdleKinematics()
 
@@ -73,7 +73,7 @@ func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
 	for {
 		select {
 
-		case p.ball = <-p.ballChannel:
+		case p.ball = <-p.ballChannel: // TODO Challenge: receive the ball from Input channel
 			ticker.Stop()
 			distance := p.getDistanceToBall(p.ball)
 			if distance < kickThreshold &&
@@ -91,7 +91,7 @@ func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
 			p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, p.ball.X, p.ball.Y))
 			p.ball.LastUpdated = time.Now()
 
-			p.ballChannel <- p.ball
+			p.ballChannel <- p.ball // TODO Challenge: kick ball back to Output channel
 
 		case <-ticker.C:						// Initial delay before game starts
 			if p.ball == nil {
