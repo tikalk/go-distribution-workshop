@@ -24,6 +24,7 @@ type Player struct {
 	MaxVelocity float64
 	LastKick time.Time
 
+	ball *Ball
 	ballInput <-chan *Ball
 	ballOutput chan<- *Ball
 
@@ -47,15 +48,12 @@ func (p *Player) GetDisplayStatus() *DisplayStatus{
 	return res
 }
 
-func (p *Player) Activate(wg sync.WaitGroup) {
+func (p *Player) Activate(wg *sync.WaitGroup) {
 
 	// TODO Challenge: Receive a display input channel, use it for display updates
 
 	p.ballInput = getBallInputChannel()
 	p.ballOutput = getBallOutputChannel()
-
-	var ball *Ball
-
 
 	go func() {
 		nextDelay := 0 * time.Second
@@ -77,83 +75,85 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 		for {
 			select {
 			case <-time.After(200 * time.Millisecond):
-				p.runToBall(ball)
+				p.runToBall()
 			}
 		}
 	}()
 
-	// TODO Challenge: start display reporting on a constant cycle
+	go p.mainLifeCycle(wg)
+
+}
+
+func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
 
 	ticker := time.NewTicker(10 * time.Second)
 
-	go func() {
+	// TODO Challenge: start display reporting on a constant cycle
 
-		for {
-			select {
+	for {
+		select {
 
 
-				case ball = <-p.ballInput:
-					ticker.Stop()
-					distance := p.getDistanceToBall(ball)
+		case p.ball = <-p.ballInput:
+			ticker.Stop()
+			distance := p.getDistanceToBall(p.ball)
 
-					if distance < kickThreshold &&
-						ball.GetSurfaceVelocity() < kickVelocityThreshold &&
-						time.Now().Sub(ball.LastKick) > 1*time.Second {
+			if distance < kickThreshold &&
+				p.ball.GetSurfaceVelocity() < kickVelocityThreshold &&
+				time.Now().Sub(p.ball.LastKick) > 1*time.Second {
 
-						p.applyKick(ball)
+				p.applyKick(p.ball)
 
-					} else {
+			} else {
 
-						time.Sleep(20 * time.Millisecond)
-						ball.ApplyKinematics()
-
-					}
-
-					p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
-					ball.LastUpdated = time.Now()
-
-					p.ballOutput <- ball
-					// TODO Challenge: report display of the ball
-
-				case <-ticker.C:						// Initial delay before game starts
-				case <- time.After(30 * time.Second):	// Lost ball message recovery
-					if ball == nil {
-						p.log("Waiting for the ball...\n")
-					} else {
-						p.log("Seems like some player got killed with the ball, throwing another!")
-						p.ballOutput <- ball
-						// TODO Challenge: report display of the ball
-					}
+				time.Sleep(20 * time.Millisecond)
+				p.ball.ApplyKinematics()
 
 			}
+
+			p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, p.ball.X, p.ball.Y))
+			p.ball.LastUpdated = time.Now()
+
+			p.ballOutput <- p.ball
+			// TODO Challenge: report display of the ball
+
+		case <-ticker.C:						// Initial delay before game starts
+		case <- time.After(30 * time.Second):	// Lost ball message recovery
+			if p.ball == nil {
+				p.log("Waiting for the ball...\n")
+			} else {
+				p.log("Seems like some player got killed with the ball, throwing another!")
+				p.ballOutput <- p.ball
+				// TODO Challenge: report display of the ball
+			}
+
 		}
-	}()
+	}
 
 	wg.Done()
-
 }
 
 func (p *Player) getDistanceToBall(ball *Ball) float64 {
 	return math.Sqrt(math.Pow(p.X-ball.X, 2) + math.Pow(p.Y-ball.Y, 2))
 }
 
-func (p *Player) runToBall(ball *Ball){
+func (p *Player) runToBall(){
 
 	// TODO make view threshold (50) random so that a distant player sees that ball after a period of time
 
 	// once every N seconds - the player gets a longer view and can see the ball. Once saw the ball -
 	// he keeps the "long view" mode for a longer period
 
-	if ball != nil {
-		dist := p.getDistanceToBall(ball)
+	if p.ball != nil {
+		dist := p.getDistanceToBall(p.ball)
 		if dist < 50 && time.Now().Sub(p.LastKick) > 2 * time.Second{
 			vel := 0.05 + rand.Float64() * p.MaxVelocity
-			p.X += (ball.X - p.X) * vel
-			p.Y += (ball.Y - p.Y) * vel
+			p.X += (p.ball.X - p.X) * vel
+			p.Y += (p.ball.Y - p.Y) * vel
 		} else {
 			p.idleMovement()
 		}
-		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, ball.X, ball.Y))
+		p.log(fmt.Sprintf("Current Position: (%f, %f), Ball Position: (%f, %f)", p.X, p.Y, p.ball.X, p.ball.Y))
 
 	} else{
 		p.idleMovement()
