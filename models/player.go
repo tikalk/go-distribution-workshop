@@ -102,7 +102,7 @@ func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
 				p.ball.GetSurfaceVelocity() < kickVelocityThreshold &&
 				time.Now().Sub(p.ball.LastKick) > 1*time.Second {
 
-				p.applyKick(p.ball)
+				p.applyKick()
 
 			} else {
 
@@ -177,21 +177,21 @@ func (p *Player) log(message string) {
 	}
 }
 
-func (p *Player) applyKick(ball *Ball){
+func (p *Player) applyKick(){
 	rand.Seed(time.Now().UnixNano())
 	angle := 2 * math.Pi * rand.Float64()
 
 	// put the ball in a larger distance than player kick threshold
 	// TODO put the ball NEAR the threshold so sometimes he might re-kick the ball
-	ball.X = p.X + 1.1 * kickThreshold * math.Cos(angle)
-	ball.Y = p.Y + 1.1 * kickThreshold * math.Sin(angle)
+	p.ball.X = p.X + 1.1 * kickThreshold * math.Cos(angle)
+	p.ball.Y = p.Y + 1.1 * kickThreshold * math.Sin(angle)
 
 	v := 1 + rand.Float64() * 2
-	ball.Vx = v * math.Cos(angle)
-	ball.Vy = v * math.Sin(angle)
-	ball.HolderID = p.ID
-	ball.HolderTeam = p.TeamID
-	ball.LastKick = time.Now()
+	p.ball.Vx = v * math.Cos(angle)
+	p.ball.Vy = v * math.Sin(angle)
+	p.ball.HolderID = p.ID
+	p.ball.HolderTeam = p.TeamID
+	p.ball.LastKick = time.Now()
 
 	p.LastKick = time.Now()
 
