@@ -27,7 +27,7 @@ var SimulateCommand = cli.Command{
 func simulate(c *cli.Context) error {
 
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(1)
 
 
 	players := c.Int("players")

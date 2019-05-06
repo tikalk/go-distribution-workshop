@@ -31,7 +31,7 @@ type Player struct {
 
 }
 
-func (p *Player) Activate(wg sync.WaitGroup) {
+func (p *Player) Activate(wg *sync.WaitGroup) {
 
 	p.ballChannel = GetBallChannel()
 
@@ -98,9 +98,11 @@ func (p *Player) Activate(wg sync.WaitGroup) {
 
 			}
 		}
+
+		wg.Done()
 	}()
 
-	wg.Done()
+
 
 }
 
