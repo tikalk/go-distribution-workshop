@@ -114,18 +114,10 @@ func ThrowBall(x, y float64){
 	}
 
 	fmt.Println("Throwing ball!")
-	output := messaging.GetOutputChannel(messaging.BallChannelName)
 
 	bs := &models.Ball{X: x, Y: y, Vx: 0, Vy: 0, Vz: 0, Z: 50}
 	bs.LastUpdated = time.Now()
 
-
-	bsSer, err := json.Marshal(bs)
-	if err != nil {
-		panic(err)
-	}
-
-	output <- bsSer
-
+	models.GetBallOutputChannel() <- bs
 
 }
