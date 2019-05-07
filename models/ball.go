@@ -4,8 +4,8 @@ import (
 	"time"
 	"math"
 	"github.com/tikalk/go-distribution-workshop/utils"
-	"encoding/json"
 	"github.com/tikalk/go-distribution-workshop/messaging"
+	"encoding/json"
 )
 
 type (
@@ -29,6 +29,10 @@ type (
 const EnergyLoss = 0.96
 const GlobalDumping = 0.98
 const g = 0.098
+
+var ballInputChannel <- chan *Ball
+var ballOutputChannel chan <- *Ball
+
 
 func (b *Ball) GetDisplayStatus() *DisplayStatus{
 	res := &DisplayStatus{}
@@ -72,39 +76,42 @@ func (b *Ball) applyKinematicsIteration(timeDiff, iterations float64){
 }
 
 func GetBallInputChannel() <- chan *Ball {
-	rawInput := messaging.GetInputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
+	if ballInputChannel == nil {
+		rawInput := messaging.GetInputChannel(messaging.BallChannelName)
+		res := make(chan *Ball)
 
-	// Ball channel population, executed in function closure
-	go func(){
-		for val := range rawInput {
-			bs := &Ball{}
-			err := json.Unmarshal(val, bs)
-			if err == nil {
-				res <- bs
+		// Ball channel population, executed in function closure
+		go func() {
+			for val := range rawInput {
+				bs := &Ball{}
+				err := json.Unmarshal(val, bs)
+				if err == nil {
+					res <- bs
+				}
 			}
-		}
-	}()
-	return res
+		}()
+
+		ballInputChannel = res
+	}
+	return ballInputChannel
 }
 
 func GetBallOutputChannel() chan <- *Ball {
-	rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
+	if ballOutputChannel == nil {
+		rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
+		res := make(chan *Ball)
 
-	// Ball channel population, executed in function closure
-	go func(){
-		for bs := range res {
-			val, err := json.Marshal(bs)
-			if err == nil {
-				rawOutput <- val
+		// Ball channel population, executed in function closure
+		go func() {
+			for bs := range res {
+				val, err := json.Marshal(bs)
+				if err == nil {
+					rawOutput <- val
+				}
 			}
-		}
-	}()
-	return res
+		}()
+
+		ballOutputChannel = res
+	}
+	return ballOutputChannel
 }
-
-
-
-
-
