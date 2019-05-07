@@ -1,13 +1,11 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 	"math"
 	"math/rand"
 	"sync"
-	"github.com/tikalk/go-distribution-workshop/messaging"
 	"github.com/tikalk/go-distribution-workshop/utils"
 )
 
@@ -52,8 +50,8 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 
 	// TODO Challenge: Receive a display input channel, use it for display updates
 
-	p.ballInput = getBallInputChannel()
-	p.ballOutput = getBallOutputChannel()
+	p.ballInput = GetBallInputChannel()
+	p.ballOutput = GetBallOutputChannel()
 
 	go func() {
 		nextDelay := 0 * time.Second
@@ -197,41 +195,5 @@ func (p *Player) applyKick(){
 
 	p.log(fmt.Sprintf("\nKick!!! (angle: %d degrees, velocity: %f)\n", int(180 * angle / math.Pi), v))
 }
-
-func getBallInputChannel() <- chan *Ball {
-	rawInput := messaging.GetInputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
-
-	// Ball channel population, executed in function closure
-	go func(){
-		for val := range rawInput {
-			bs := &Ball{}
-			err := json.Unmarshal(val, bs)
-			if err == nil {
-				res <- bs
-			}
-		}
-	}()
-	return res
-}
-
-func getBallOutputChannel() chan <- *Ball {
-	rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
-	res := make(chan *Ball)
-
-	// Ball channel population, executed in function closure
-	go func(){
-		for bs := range res {
-			val, err := json.Marshal(bs)
-			if err == nil {
-				rawOutput <- val
-			}
-		}
-	}()
-	return res
-}
-
-
-
 
 

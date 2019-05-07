@@ -4,6 +4,8 @@ import (
 	"time"
 	"math"
 	"github.com/tikalk/go-distribution-workshop/utils"
+	"github.com/tikalk/go-distribution-workshop/messaging"
+	"encoding/json"
 )
 
 type (
@@ -27,6 +29,10 @@ type (
 const EnergyLoss = 0.96
 const GlobalDumping = 0.98
 const g = 0.098
+
+var ballInputChannel <- chan *Ball
+var ballOutputChannel chan <- *Ball
+
 
 func (b *Ball) GetDisplayStatus() *DisplayStatus{
 	res := &DisplayStatus{}
@@ -67,6 +73,47 @@ func (b *Ball) applyKinematicsIteration(timeDiff, iterations float64){
 	utils.ApplyVelocityComponent(&b.Y, &b.Vy, 1.0, iterations)
 	utils.ApplyVelocityComponent(&b.Z, &b.Vz, EnergyLoss, iterations)
 
+}
+
+func GetBallInputChannel() <- chan *Ball {
+	if ballInputChannel == nil {
+		rawInput := messaging.GetInputChannel(messaging.BallChannelName)
+		res := make(chan *Ball)
+
+		// Ball channel population, executed in function closure
+		go func() {
+			for val := range rawInput {
+				bs := &Ball{}
+				err := json.Unmarshal(val, bs)
+				if err == nil {
+					res <- bs
+				}
+			}
+		}()
+
+		ballInputChannel = res
+	}
+	return ballInputChannel
+}
+
+func GetBallOutputChannel() chan <- *Ball {
+	if ballOutputChannel == nil {
+		rawOutput := messaging.GetOutputChannel(messaging.BallChannelName)
+		res := make(chan *Ball)
+
+		// Ball channel population, executed in function closure
+		go func() {
+			for bs := range res {
+				val, err := json.Marshal(bs)
+				if err == nil {
+					rawOutput <- val
+				}
+			}
+		}()
+
+		ballOutputChannel = res
+	}
+	return ballOutputChannel
 }
 
 
