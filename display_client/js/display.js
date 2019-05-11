@@ -9,12 +9,12 @@ let Player = class {
 		this.targetLabelAlpha = 1;
 
 		this.hl = new createjs.Shape();
-		this.hl.graphics.beginFill("yellow").drawCircle(0, 0, config.playerRadius * 2);
-		this.hl.alpha = 0.5;
+		this.hl.graphics.ss(8).s("white").dc(0, 0, config.playerRadius).es();
+		this.hl.alpha = 0.8;
 		this.container.addChild(this.hl);
 
 		this.graphic = new createjs.Shape();
-		this.graphic.graphics.beginFill(model.team_id).drawCircle(0, 0, config.playerRadius);
+		this.graphic.graphics.f(model.team_id).dc(0, 0, config.playerRadius).ef();
 
 		let that = this;
 		this.graphic.addEventListener("mouseover", function(){
@@ -29,9 +29,11 @@ let Player = class {
 
 		this.hl.visible = false;
 
-		this.label = new createjs.Text(model.item_label, "15px Arial", "#333");
-		this.label.x = config.playerRadius * 1.1;
-		this.label.y = 6;
+		this.label = new createjs.Text(model.item_label, "15px Arial", "yellow");
+		this.label.textAlign = "center";
+		this.label.width = 200;
+		this.label.x = 0;
+		this.label.y = config.playerRadius * 3;
 		this.label.textBaseline = "alphabetic";
 		this.container.addChild(this.label);
 
@@ -94,13 +96,21 @@ let Ball = class {
 		this.config = config;
 
 		this.graphic = new createjs.Shape();
-		this.graphic.graphics.beginFill("black").drawCircle(0, 0, config.ballRadius);
+		this.graphic.graphics.f("white").dc(0, 0, config.ballRadius).ef();
+
+		this.shadow = new createjs.Shape();
+		this.shadow.graphics.f("black").de(-config.ballRadius * 0.3, config.ballRadius * 0.6, config.ballRadius * 2, config.ballRadius).ef();
+		this.shadow.alpha = 0.2;
+
+		this.container = new createjs.Container();
+		this.container.addChild(this.shadow);
+		this.container.addChild(this.graphic);
 
 		if(!model){
 			model = {x: 0, y : 0}
 		}
 		this.update(model, true);
-		config.stage.addChild(this.graphic);
+		config.stage.addChild(this.container);
 	}
 
 	update(model, hard){
@@ -110,12 +120,12 @@ let Ball = class {
 		} else {
 
 			if (hard) {
-				this.graphic.x = this.targetX;
-				this.graphic.y = this.targetY;
+				this.container.x = this.targetX;
+				this.container.y = this.targetY;
 			}
 			else {
-				this.graphic.x += (this.targetX - this.graphic.x) * 0.2;
-				this.graphic.y += (this.targetY - this.graphic.y) * 0.2;
+				this.container.x += (this.targetX - this.container.x) * 0.2;
+				this.container.y += (this.targetY - this.container.y) * 0.2;
 			}
 		}
 	}
@@ -169,16 +179,16 @@ async function init() {
 					}
 					break;
 				case "ball":
-						ball.update(item);
-						if(item.item_id && players[key]) {
+					ball.update(item);
+					if(item.item_id && players[key]) {
 
 
-							if(lastHolder){
-								lastHolder.forget();
-							}
-							lastHolder = players[key]
-							lastHolder.highlight();
+						if(lastHolder){
+							lastHolder.forget();
 						}
+						lastHolder = players[key]
+						lastHolder.highlight();
+					}
 					break;
 			}
 		}
@@ -204,8 +214,47 @@ async function init() {
 function drawField(stage){
 	let field = new createjs.Shape();
 	let g = field.graphics;
-	g.beginFill("#080").drawRect(0, 0, config.maxWidth, config.maxHeight).endFill();
-	stage.add(field);
+	let baseColor = "#080";
+	let hlColor = "#0B0";
+	let lineColor = "#FFF";
+	let borderGap = 0.05;
+	let centerCircleRadius = 0.12;
+	let gateFarWidth = 0.1;
+	let gateFarHeight = 0.25;
+	let gateNearWidth = 0.04;
+	let gateNearHeight = 0.12;
+	let gateWidth = 0.015;
+	let gateHeight = 0.05;
+	let lengthDivisions = 14;
+
+	// Base
+	g.f(baseColor).dr(0, 0, config.maxWidth, config.maxHeight).ef();
+
+	// Divisions
+	for (let i = 0; i < lengthDivisions; i++){
+		if(i %2 == 0) {
+			g.f(hlColor).dr(i * config.maxWidth / lengthDivisions, 0, config.maxWidth / lengthDivisions, config.maxHeight).ef();
+		}
+	}
+
+	// Border
+	g.ss(2).s(lineColor).dr(config.maxHeight * borderGap, config.maxHeight * borderGap, config.maxWidth - (config.maxHeight * 2 * borderGap), config.maxHeight * (1 - 2 * borderGap)).es();
+
+	// Center
+	g.ss(2).s(lineColor).mt(config.maxWidth / 2, 0).lt(config.maxWidth / 2, config.maxHeight).es();
+	g.ss(2).s(lineColor).dc(config.maxWidth / 2, config.maxHeight / 2, config.maxHeight * centerCircleRadius).es();
+
+	// Gates
+	g.ss(2).s(lineColor).dr(config.maxHeight * borderGap, config.maxHeight * (0.5 - gateFarHeight),	config.maxWidth * gateFarWidth,	config.maxHeight * 2 * gateFarHeight).es();
+	g.ss(2).s(lineColor).dr(config.maxWidth * (1 - gateFarWidth) - config.maxHeight * (borderGap), config.maxHeight * (0.5 - gateFarHeight), config.maxWidth * gateFarWidth, config.maxHeight * 2 * gateFarHeight).es();
+	g.ss(2).s(lineColor).dr(config.maxHeight * borderGap, config.maxHeight * (0.5 - gateNearHeight), config.maxWidth * gateNearWidth, config.maxHeight * 2 * gateNearHeight).es();
+	g.ss(2).s(lineColor).dr(config.maxWidth * (1 - gateNearWidth) - config.maxHeight * (borderGap), config.maxHeight * (0.5 - gateNearHeight), config.maxWidth * gateNearWidth, config.maxHeight * 2 * gateNearHeight).es();
+
+	g.ss(2).s(lineColor).f("rgba(255, 255, 255, 0.5)").dr(config.maxHeight * borderGap - config.maxWidth * gateWidth, config.maxHeight * (0.5 - gateHeight), config.maxWidth * gateWidth,	config.maxHeight * 2 * gateHeight).ef().es();
+	g.ss(2).s(lineColor).f("rgba(255, 255, 255, 0.5)").dr(config.maxWidth - config.maxHeight * (borderGap), config.maxHeight * (0.5 - gateHeight), config.maxWidth * gateWidth,	config.maxHeight * 2 * gateHeight).ef().es();
+
+
+	stage.addChild(field);
 }
 
 function prettifyDisplay(players) {
@@ -249,12 +298,3 @@ function cleanupDeadPlayers(players, updatedKeys, lastHolder) {
 	}
 	return lastHolder;
 }
-
-
-
-
-
-
-
-
-
