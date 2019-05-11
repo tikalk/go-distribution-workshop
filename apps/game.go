@@ -21,7 +21,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 
 
 	for i := 0; i < numPlayers; i++ {
-		u2 := uuid.NewV4()
+		u2 := uuid.Must(uuid.NewV4())
 
 		player := &models.Player{
 			ID: u2.String(),
@@ -64,7 +64,7 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 
 	for i := 0; i < numPlayers; i++ {
 
-		u2 := uuid.NewV4()
+		u2 := uuid.Must(uuid.NewV4())
 
 		player := &models.Player{
 			ID: u2.String(),
