@@ -4,7 +4,7 @@
 In this Go workshop we'll build and execute a distributed simulation of a soccer game.
 We'll use Go builtin concurrency concepts such as goroutines and channels, [Redis](https://redis.io/) as a
 message broker and [Vice](https://github.com/matryer/vice) library to connect internal 
-go-channel with Redis.
+go-channels with Redis.
 
 This workshop is divided to 5 development phases, each one provides an initial state
 as separated branch, with a challenge to develop. At the end of this workshop we'll
