@@ -29,7 +29,7 @@ let Player = class {
 
 		this.hl.visible = false;
 
-		this.label = new createjs.Text(model.item_label, "15px Arial", "yellow");
+		this.label = new createjs.Text(model.item_label, "15px Arial", "white");
 		this.label.textAlign = "center";
 		this.label.width = 200;
 		this.label.x = 0;
@@ -214,8 +214,9 @@ async function init() {
 function drawField(stage){
 	let field = new createjs.Shape();
 	let g = field.graphics;
-	let baseColor = "#080";
-	let hlColor = "#0B0";
+	let baseColor1 = "#060";
+	let baseColor2 = "#090";
+	let hlColor = "rgba(0, 180, 0, 0.5)";
 	let lineColor = "#FFF";
 	let borderGap = 0.05;
 	let centerCircleRadius = 0.12;
@@ -228,7 +229,7 @@ function drawField(stage){
 	let lengthDivisions = 14;
 
 	// Base
-	g.f(baseColor).dr(0, 0, config.maxWidth, config.maxHeight).ef();
+	g.lf([baseColor1,baseColor2], [0, 1], config.maxWidth, 0, 0, config.maxHeight).dr(0, 0, config.maxWidth, config.maxHeight).ef();
 
 	// Divisions
 	for (let i = 0; i < lengthDivisions; i++){
@@ -298,12 +299,3 @@ function cleanupDeadPlayers(players, updatedKeys, lastHolder) {
 	}
 	return lastHolder;
 }
-
-
-
-
-
-
-
-
-
