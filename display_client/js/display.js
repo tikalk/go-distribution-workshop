@@ -140,6 +140,7 @@ async function init() {
 
 
 	let stage = new createjs.Stage("main_canvas");
+	drawField(stage);
 	stage.enableMouseOver(10);
 
 	config.stage = stage;
@@ -198,6 +199,13 @@ async function init() {
 	setInterval(getDisplay, config.displayInterval)
 	setInterval(animate, config.animationInterval)
 
+}
+
+function drawField(stage){
+	let field = new createjs.Shape();
+	let g = field.graphics;
+	g.beginFill("#080").drawRect(0, 0, config.maxWidth, config.maxHeight).endFill();
+	stage.add(field);
 }
 
 function prettifyDisplay(players) {
