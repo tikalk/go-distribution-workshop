@@ -5,7 +5,7 @@ type (
 )
 
 const (
-	TeamBlue Team = "blue"
-	TeamRed  Team = "red"
-	TeamBoth Team = "both"
+	Brazil    Team = "brazil"
+	Argentina Team = "argentina"
+	Both      Team = "both"
 )
