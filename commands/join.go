@@ -24,10 +24,10 @@ var JoinCommand = cli.Command{
 			Name:  "team",
 			Usage: fmt.Sprintf("team to assign players to " +
 					"(%s / %s / both). On 'both' players will be assigned equally to both team",
-					string(models.TeamBlue),
-					string(models.TeamRed),
+					string(models.Brazil),
+					string(models.Argentina),
 				),
-			Value: string(models.TeamBlue),
+			Value: string(models.Brazil),
 		},
 	},
 }
@@ -46,14 +46,14 @@ func joinGame(c *cli.Context) error {
 	}
 
 	switch teamFlag {
-	case string(models.TeamBlue):
-	case string(models.TeamRed):
+	case string(models.Brazil):
+	case string(models.Argentina):
 	case string(models.TeamBoth):
 		break
 	default:
-		println("Illegal value  for --team flag. Must be one of {blue, red, both}")
-		return errors.New("Illegal value  for --team flag. Must be one of {blue, red, both}")
-
+		errMsg := fmt.Sprintf("Illegal value  for --team flag. Must be one of {%s, %s, both}", models.Brazil, models.Argentina)
+		println(errMsg)
+		return errors.New(errMsg)
 	}
 
 
