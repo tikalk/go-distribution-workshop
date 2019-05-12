@@ -53,20 +53,7 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 	p.ballInput = GetBallInputChannel()
 	p.ballOutput = GetBallOutputChannel()
 
-	go func() {
-		nextDelay := 0 * time.Second
-		for {
-			select {
-			case <-time.After(nextDelay):
-
-				p.idleV = 0.5 + 0.5 * rand.Float64()
-				p.idleAngle = math.Pi * 2 * rand.Float64()
-				p.idleVx = math.Cos(p.idleAngle) * p.idleV
-				p.idleVy = math.Sin(p.idleAngle) * p.idleV
-				nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
-			}
-		}
-	}()
+	go p.setIdleKinematics()
 
 	// Closing distance to ball
 	go func() {
@@ -80,6 +67,21 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 
 	go p.mainLifeCycle(wg)
 
+}
+
+func (p *Player) setIdleKinematics() {
+	nextDelay := 0 * time.Second
+	for {
+		select {
+		case <-time.After(nextDelay):
+
+			p.idleV = 0.5 + 0.5 * rand.Float64()
+			p.idleAngle = math.Pi * 2 * rand.Float64()
+			p.idleVx = math.Cos(p.idleAngle) * p.idleV
+			p.idleVy = math.Sin(p.idleAngle) * p.idleV
+			nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
+		}
+	}
 }
 
 func (p *Player) mainLifeCycle(wg *sync.WaitGroup) {
