@@ -1,5 +1,18 @@
 // TODO remove dead players from display
 
+let colorMap = {
+	brazil: {
+		shirt: "yellow",
+		stripe: "#060",
+		label: "black"
+	},
+	argentina: {
+		shirt: "#75AADB",
+		stripe: "white",
+		label: "white"
+	}
+}
+
 let Player = class {
 	constructor(model, config) {
 		this.config = config;
@@ -9,27 +22,38 @@ let Player = class {
 		this.targetLabelAlpha = 1;
 
 		this.hl = new createjs.Shape();
-		this.hl.graphics.ss(8).s("white").dc(0, 0, config.playerRadius).es();
+		this.hl.graphics.ss(14).s("white").dc(0, 0, config.playerRadius).es();
 		this.hl.alpha = 0.8;
 		this.container.addChild(this.hl);
 
-		this.graphic = new createjs.Shape();
-		this.graphic.graphics.f(model.team_id).dc(0, 0, config.playerRadius).ef();
+		this.body = new createjs.Shape();
+		this.name = model.item_label;
+
+
+
+		this.body.graphics.s("black").f(colorMap[model.team_id].shirt).dc(0, 0, config.playerRadius).ef().es();
+		let mask = new createjs.Shape();
+		mask.graphics.f("black").dc(0, 0, config.playerRadius).ef();
+		this.stripe = new createjs.Shape();
+		this.stripe.graphics.f(colorMap[model.team_id].stripe).mt(-config.playerRadius * 0.4, -config.playerRadius).lt(0, config.playerRadius * 0.3).lt(config.playerRadius * 0.4, -config.playerRadius).ef();
+		this.stripe.mask = mask;
+		this.container.addChild(this.body);
+		this.container.addChild(this.stripe);
 
 		let that = this;
-		this.graphic.addEventListener("mouseover", function(){
+		this.container.addEventListener("mouseover", function(){
 			that.mouseover = true;
 		});
 
-		this.graphic.addEventListener("mouseout", function(){
+		this.container.addEventListener("mouseout", function(){
 			that.mouseover = false;
 		});
 
-		this.container.addChild(this.graphic);
+
 
 		this.hl.visible = false;
 
-		this.label = new createjs.Text(model.item_label, "15px Arial", "white");
+		this.label = new createjs.Text(this.name, "15px Arial", colorMap[model.team_id].label);
 		this.label.textAlign = "center";
 		this.label.width = 200;
 		this.label.x = 0;
@@ -48,6 +72,7 @@ let Player = class {
 			this.targetY = this.config.maxHeight * model.y / 100;
 			this.clear = true;
 		} else {
+			let lastPos = {x: this.container.x, y: this.container.y}
 			if (hard) {
 				this.container.x = this.targetX;
 				this.container.y = this.targetY;
@@ -56,6 +81,7 @@ let Player = class {
 				this.container.x += (this.targetX - this.container.x) * 0.2;
 				this.container.y += (this.targetY - this.container.y) * 0.2;
 			}
+			this.stripe.rotation = 180 * Math.atan2(this.container.y - lastPos.y, this.container.x - lastPos.x) / Math.PI + 90;
 			this.targetLabelAlpha = this.clear ? 1 : 0;
 			if (this.hl.visible || this.mouseover){
 				this.label.alpha = 1;
@@ -89,14 +115,15 @@ let Player = class {
 		let dy = this.targetY - otherTarget.y;
 		return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 	}
+
 }
 
 let Ball = class {
 	constructor(model, config) {
 		this.config = config;
 
-		this.graphic = new createjs.Shape();
-		this.graphic.graphics.f("white").dc(0, 0, config.ballRadius).ef();
+		this.body = new createjs.Shape();
+		this.body.graphics.f("white").dc(0, 0, config.ballRadius).ef();
 
 		this.shadow = new createjs.Shape();
 		this.shadow.graphics.f("black").de(-config.ballRadius * 0.3, config.ballRadius * 0.6, config.ballRadius * 2, config.ballRadius).ef();
@@ -104,7 +131,7 @@ let Ball = class {
 
 		this.container = new createjs.Container();
 		this.container.addChild(this.shadow);
-		this.container.addChild(this.graphic);
+		this.container.addChild(this.body);
 
 		if(!model){
 			model = {x: 0, y : 0}
@@ -143,11 +170,12 @@ var config = {
 }
 
 async function init() {
+
+	handleAudio();
+
 	let canvas = document.getElementById("main_canvas");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-
-
 
 	let stage = new createjs.Stage("main_canvas");
 	drawField(stage);
@@ -181,13 +209,15 @@ async function init() {
 				case "ball":
 					ball.update(item);
 					if(item.item_id && players[key]) {
+						if (lastHolder != players[key]) {
+							if (lastHolder) {
+								lastHolder.forget();
+							}
+							lastHolder = players[key]
+							lastHolder.highlight();
 
-
-						if(lastHolder){
-							lastHolder.forget();
+							speak(lastHolder.name);
 						}
-						lastHolder = players[key]
-						lastHolder.highlight();
 					}
 					break;
 			}
@@ -206,8 +236,8 @@ async function init() {
 		stage.update();
 	}
 
-	setInterval(getDisplay, config.displayInterval)
-	setInterval(animate, config.animationInterval)
+	setInterval(getDisplay, config.displayInterval);
+	setInterval(animate, config.animationInterval);
 
 }
 
@@ -285,6 +315,43 @@ function prettifyDisplay(players) {
 
 		}
 	}
+}
+
+var audioBackgrounds = [
+	{src: "media/crowd1.m4a", volume: 0.5},
+	{src: "media/crowd2.m4a", volume: 0.7},
+]
+
+function handleAudio(){
+	let audio = document.getElementById("player");
+	let audioIndex = Math.floor(Math.random() * audioBackgrounds.length);
+
+	audio.addEventListener("ended", function(e){
+		console.log("Audio Ended");
+		audioIndex++;
+		audioIndex %= audioBackgrounds.length;
+		audio.src = audioBackgrounds[audioIndex].src;
+		audio.volume = audioBackgrounds[audioIndex].volume;
+		audio.play();
+	});
+
+	setTimeout(function(){
+		audio.src = audioBackgrounds[audioIndex].src;
+		audio.volume = audioBackgrounds[audioIndex].volume;
+		audio.play();
+	}, 100);
+}
+function speak(name) {
+	var msg = new SpeechSynthesisUtterance(name);
+	var voices = window.speechSynthesis.getVoices();
+	msg.voice = voices[7]; // Note: some voices don't support altering params
+	msg.voiceURI = 'native';
+	msg.volume = 1; // 0 to 1
+	msg.rate = 1; // 0.1 to 10
+	msg.pitch = 1.5; //0 to 2
+	msg.text = name;
+	window.speechSynthesis.speak(msg);
+
 }
 
 function cleanupDeadPlayers(players, updatedKeys, lastHolder) {
