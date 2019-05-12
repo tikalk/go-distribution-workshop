@@ -147,9 +147,9 @@ func (p *Player)idleMovement() {
 func (p *Player) log(message string) {
 	if message[0:1] == "\n" {
 		message = message[1:]
-		fmt.Printf("\n%s: %s", p.Name, message)
+		fmt.Printf("\n%s (%s): %s", p.Name, p.TeamID, message)
 	} else {
-		fmt.Printf("\r%s: %s", p.Name, message)
+		fmt.Printf("\r%s (%s): %s", p.Name, p.TeamID, message)
 	}
 }
 
