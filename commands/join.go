@@ -48,7 +48,7 @@ func joinGame(c *cli.Context) error {
 	switch teamFlag {
 	case string(models.Brazil):
 	case string(models.Argentina):
-	case string(models.TeamBoth):
+	case string(models.Both):
 		break
 	default:
 		errMsg := fmt.Sprintf("Illegal value  for --team flag. Must be one of {%s, %s, both}", models.Brazil, models.Argentina)

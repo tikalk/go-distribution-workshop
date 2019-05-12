@@ -28,7 +28,7 @@ func JoinGame(players []string, team models.Team, externalWaitGroup *sync.WaitGr
 			Y: rand.Float64() * 100,
 			MaxVelocity: rand.Float64() * 0.1,
 		}
-		if (team == models.TeamBoth && i %2 == 0) || team == models.Argentina {
+		if (team == models.Both && i %2 == 0) || team == models.Argentina {
 			player.TeamID = models.Argentina
 		} else{
 			player.TeamID = models.Brazil
@@ -63,17 +63,17 @@ func ExecuteSimulation(numPlayers int, externalWaitGroup *sync.WaitGroup) {
 
 		player := &models.Player{
 			ID: u2.String(),
-			Name: fmt.Sprintf("Player %d", i),		// TODO get names from list
 			X: rand.Float64() * 100,
 			Y: rand.Float64() * 100,
 			MaxVelocity: rand.Float64() * 0.1,
 		}
-		if i %2 == 0 {
+		if i % 2 == 0 {
 			player.TeamID = models.Argentina
 		} else {
 			player.TeamID = models.Brazil
 		}
 
+		player.Name = models.GetPlayerName(player.TeamID)
 		player.Activate(wg)
 	}
 
