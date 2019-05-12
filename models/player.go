@@ -65,6 +65,8 @@ func (p *Player) Activate(wg *sync.WaitGroup) {
 		}
 	}()
 
+	// TODO Challenge: Periodically report position to display channel
+
 	go p.mainLifeCycle(wg)
 
 }
@@ -138,8 +140,6 @@ func (p *Player) getDistanceToBall(ball *Ball) float64 {
 }
 
 func (p *Player) runToBall(){
-
-	// TODO make view threshold (50) random so that a distant player sees that ball after a period of time
 
 	// once every N seconds - the player gets a longer view and can see the ball. Once saw the ball -
 	// he keeps the "long view" mode for a longer period
