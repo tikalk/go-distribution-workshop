@@ -162,7 +162,7 @@ func (p *Player) runToBall(){
 
 	if p.ball != nil {
 		dist := p.getDistanceToBall(p.ball)
-		if dist < 50 && time.Now().Sub(p.LastKick) > 2 * time.Second{
+		if dist < 30 && time.Now().Sub(p.LastKick) > 8 * time.Second{
 			vel := 0.05 + rand.Float64() * p.MaxVelocity
 			p.X += (p.ball.X - p.X) * vel
 			p.Y += (p.ball.Y - p.Y) * vel
