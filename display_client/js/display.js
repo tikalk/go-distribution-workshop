@@ -35,7 +35,7 @@ let Player = class {
 		let mask = new createjs.Shape();
 		mask.graphics.f("black").dc(0, 0, config.playerRadius).ef();
 		this.stripe = new createjs.Shape();
-		this.stripe.graphics.f(colorMap[model.team_id].stripe).mt(-config.playerRadius * 0.4, -config.playerRadius).lt(0, config.playerRadius * 0.3).lt(config.playerRadius * 0.4, -config.playerRadius).ef();
+		this.stripe.graphics.f(colorMap[model.team_id].stripe).dr(-config.playerRadius * 0.3, -config.playerRadius, config.playerRadius * 0.6, config.playerRadius * 1.3).ef();
 		this.stripe.mask = mask;
 		this.container.addChild(this.body);
 		this.container.addChild(this.stripe);
