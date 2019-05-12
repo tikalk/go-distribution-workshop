@@ -59,21 +59,7 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg *sync.WaitGr
 	p.ballInput = GetBallInputChannel()
 	p.ballOutput = GetBallOutputChannel()
 
-	go func() {
-		nextDelay := 0 * time.Second
-		for {
-			select {
-			case <-time.After(nextDelay):
-
-				p.idleV = 0.5 + 0.5 * rand.Float64()
-				p.idleAngle = math.Pi * 2 * rand.Float64()
-				p.idleVx = math.Cos(p.idleAngle) * p.idleV
-				p.idleVy = math.Sin(p.idleAngle) * p.idleV
-			}
-
-			nextDelay = time.Duration(4.0 + rand.Float64() * 5.0) * time.Second
-		}
-	}()
+	go p.setIdleKinematics()
 
 	// Closing distance to ball
 	go func() {
@@ -98,6 +84,21 @@ func (p *Player) Activate(displayChannel chan <- *DisplayStatus, wg *sync.WaitGr
 
 	go p.mainLifeCycle(displayChannel, wg)
 
+}
+
+func (p *Player) setIdleKinematics() {
+	nextDelay := 0 * time.Second
+	for {
+		select {
+		case <-time.After(nextDelay):
+
+			p.idleV = 0.5 + 0.5 * rand.Float64()
+			p.idleAngle = math.Pi * 2 * rand.Float64()
+			p.idleVx = math.Cos(p.idleAngle) * p.idleV
+			p.idleVy = math.Sin(p.idleAngle) * p.idleV
+			nextDelay = time.Duration(5.0 + rand.Float64() * 6.0) * time.Second
+		}
+	}
 }
 
 func (p *Player) mainLifeCycle(displayChannel chan <- *DisplayStatus, wg *sync.WaitGroup) {
@@ -186,9 +187,9 @@ func (p *Player)idleMovement() {
 func (p *Player) log(message string) {
 	if message[0:1] == "\n" {
 		message = message[1:]
-		fmt.Printf("\n%s: %s", p.Name, message)
+		fmt.Printf("\n%s (%s): %s", p.Name, p.TeamID, message)
 	} else {
-		fmt.Printf("\r%s: %s", p.Name, message)
+		fmt.Printf("\r%s (%s): %s", p.Name, p.TeamID, message)
 	}
 }
 
