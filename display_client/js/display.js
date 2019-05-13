@@ -29,6 +29,17 @@ let Player = class {
 		this.body = new createjs.Shape();
 		this.name = model.item_label;
 
+		let shadowImg = new Image();
+		shadowImg.src = "media/shadow.png";
+		this.shadow = new createjs.Container();
+		let shadowBitmap = new createjs.Bitmap(shadowImg);
+		this.shadow.addChild(shadowBitmap);
+		shadowBitmap.x = -shadowImg.width / 2;
+		shadowBitmap.y = -shadowImg.height / 2;
+		this.shadow.alpha = 0.4;
+		config.shadowContainer.addChild(this.shadow);
+
+
 
 
 		this.body.graphics.s("black").f(colorMap[model.team_id].shirt).dc(0, 0, config.playerRadius).ef().es();
@@ -81,8 +92,14 @@ let Player = class {
 				this.container.x += (this.targetX - this.container.x) * 0.2;
 				this.container.y += (this.targetY - this.container.y) * 0.2;
 			}
+
+			this.shadow.x = this.container.x;
+			this.shadow.y = this.container.y;
+
 			this.stripe.rotation = 180 * Math.atan2(this.container.y - lastPos.y, this.container.x - lastPos.x) / Math.PI + 90;
 			this.targetLabelAlpha = this.clear ? 1 : 0;
+
+
 			if (this.hl.visible || this.mouseover){
 				this.label.alpha = 1;
 			} else {
@@ -103,6 +120,7 @@ let Player = class {
 	kill(){
 		// TODO add some cool animation
 		this.config.stage.removeChild(this.container)
+		this.config.shadowContainer.removeChild(this.shadow);
 	}
 
 	getTarget(p){
@@ -181,7 +199,15 @@ async function init() {
 	drawField(stage);
 	stage.enableMouseOver(10);
 
-	config.stage = stage;
+	let playerContainer = new createjs.Container();
+	let shadowContainer = new createjs.Container();
+
+	stage.addChild(shadowContainer);
+	stage.addChild(playerContainer);
+
+	config.stage = playerContainer;
+	config.shadowContainer = shadowContainer;
+
 
 	let players = [];
 	let ball = new Ball(null, config);
@@ -191,7 +217,7 @@ async function init() {
 		let res = await fetch("/display");
 		let display = await res.json();
 
-		let updatedKeys = {}
+		let updatedKeys = {};
 
 
 		for (let key in display.items){
