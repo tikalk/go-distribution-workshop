@@ -430,12 +430,3 @@ function cleanupDeadPlayers(players, updatedKeys, lastHolder) {
 	}
 	return lastHolder;
 }
-
-
-
-
-
-
-
-
-
