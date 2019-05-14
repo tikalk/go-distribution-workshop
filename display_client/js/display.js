@@ -28,6 +28,7 @@ let Player = class {
 
 		this.body = new createjs.Shape();
 		this.name = model.item_label;
+		this.team = model.team_id;
 
 		let shadowImg = new Image();
 		shadowImg.src = "media/shadow.png";
@@ -36,7 +37,7 @@ let Player = class {
 		this.shadow.addChild(shadowBitmap);
 		shadowBitmap.x = -shadowImg.width / 2;
 		shadowBitmap.y = -shadowImg.height / 2;
-		this.shadow.alpha = 0.4;
+		this.shadow.alpha = 0.25;
 		config.shadowContainer.addChild(this.shadow);
 
 
@@ -178,8 +179,6 @@ let Ball = class {
 }
 
 var config = {
-	maxWidth: window.innerWidth,
-	maxHeight: window.innerHeight,
 	playerRadius: 10,
 	displayInterval: 100,
 	animationInterval: 25,
@@ -192,8 +191,16 @@ async function init() {
 	handleAudio();
 
 	let canvas = document.getElementById("main_canvas");
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	let scoreboard = document.getElementById("scoreboard");
+	config.maxWidth = canvas.width = window.innerWidth;
+	config.maxHeight = canvas.height = window.innerHeight - scoreboard.clientHeight;
+
+	let scorescreen = document.getElementById("score-screen");
+	let lcdBrazil = document.getElementById("passes-brazil");
+	let lcdArgentina = document.getElementById("passes-argentina");
+
+
+
 
 	let stage = new createjs.Stage("main_canvas");
 	drawField(stage);
@@ -243,6 +250,7 @@ async function init() {
 							lastHolder.highlight();
 
 							speak(lastHolder.name);
+							updateScore(lastHolder);
 						}
 					}
 					break;
@@ -258,14 +266,44 @@ async function init() {
 		}
 
 		ball.update();
-
 		stage.update();
+	}
+
+	let score = {
+		argentina: 0,
+		brazil: 0
+	}
+	let teamPasses = {
+		argentina: 0,
+		brazil: 0
+	}
+
+	let lastTeam = "";
+	function updateScore(holder){
+		let otherTeam = holder.team == "brazil" ? "argentina" : "brazil";
+		if(holder.team != lastTeam) {
+			teamPasses[holder.team] = 0;
+			teamPasses[otherTeam] = 0;
+		}
+		teamPasses[holder.team]++;
+		lastTeam = holder.team;
+		if (teamPasses == 5) {
+			teamPasses[holder.team] = 0;
+			score[holder.team]++;
+			scorescreen.innerHTML = score.brazil + ":" + score.argentina;
+		}
+
+		lcdBrazil.innerHTML = teamPasses.brazil;
+		lcdArgentina.innerHTML = teamPasses.argentina;
+
 	}
 
 	setInterval(getDisplay, config.displayInterval);
 	setInterval(animate, config.animationInterval);
 
 }
+
+
 
 function drawField(stage){
 	let field = new createjs.Shape();
