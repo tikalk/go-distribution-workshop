@@ -1,8 +1,101 @@
+@import url('https://fonts.googleapis.com/css?family=Orbitron');
+@import url('https://fonts.googleapis.com/css?family=Oswald');
+
+
 html, body {
 	margin: 0px;
 	padding: 0px;
 }
 
+
 #player {
 	visibility: hidden;
+}
+
+#scoreboard {
+	height: 60px;
+	width: 100%;
+
+	text-align: center;
+	overflow-y: hidden;
+	vertical-align: top;
+	position: relative;
+	background: -moz-linear-gradient(right, #b22f03 0%, #600800 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(right, #b22f03 0%,#600800 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to left, #b22f03 0%,#600800 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+	border-bottom: 1px solid white;
+}
+
+.lcd {
+	height: 40px;
+	width: 130px;
+	display: inline-block;
+	background: #222;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding-top: 5px;
+	color: red;
+	font-size: 40px;
+	font-family: Orbitron;
+
+	-moz-text-shadow: 0 0 5px #f55;
+	-webkit-text-shadow: 0 0 5px #f55;
+	text-shadow: 0px 0px 5px #f55;
+
+	border: 2px solid white;
+	border-radius: 7px;
+}
+
+#passes-brazil{
+	left: 5%;
+	transform: translate(0, -50%);
+}
+#passes-argentina{
+	right: 5%;
+	left: unset;
+	transform: translate(0, -50%);
+}
+
+#scoreboardshadow {
+	position:absolute;
+	top: 61px;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 10;
+}
+
+#scoreboard img {
+	position: absolute;
+	top: 50%;
+}
+
+#flag-brazil {
+	right: 50%;
+	transform: translate(-85px, -50%);
+}
+#flag-argentina {
+	left: 50%;
+	transform: translate(85px, -50%);
+}
+.label {
+	position: absolute;
+	top: 50%;
+
+	color: white;
+	font-style: italic;
+	font-family: Oswald;
+	font-size: 20px;
+}
+.brazil {
+	right: 50%;
+	transform: translate(-150px, -50%);
+	text-align: right;
+}
+.argentina {
+	left: 50%;
+	transform: translate(150px, -50%);
+	text-align: left;
 }
