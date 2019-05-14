@@ -7,6 +7,18 @@
 </head>
 
 <body onload="init()">
+	<div id="scoreboard">
+		<div id="passes-brazil" class="lcd">0</div>
+		<div class="label brazil">BRAZIL</div>
+		<img id="flag-brazil" src="media/brazil.png" />
+
+		<div id="score-screen" class="lcd">0:0</div>
+
+		<img id="flag-argentina" src="media/argentina.png" />
+		<div class="label argentina">ARGENTINA</div>
+		<div id="passes-argentina" class="lcd">0</div>
+	</div>
+	<img id="scoreboardshadow" src="media/bordershadow.png"/>
 	<canvas id="main_canvas"></canvas>
 	<iframe src="media/silence.mp3" allow="autoplay" id="audio" style="display:none"></iframe>
 	<audio id="player" preload="none" volume="0.2">

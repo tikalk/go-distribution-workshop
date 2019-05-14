@@ -92,7 +92,3 @@ To get more info about global and command-specific flags, just use this command 
 
 ## License ##
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
-
-
-
