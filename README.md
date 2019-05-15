@@ -54,7 +54,8 @@ redis-server
 #### GIT ####
 1. Install GIT (if not installed already) following these [instructions](https://www.atlassian.com/git/tutorials/install-git).
 2. cd to the `src` folder in your `GOPATH`
-3. clone this project by this line
+3. Under `src` make `folder github.com/tikalk` and cd to it
+4. clone this project by this line
 ```$xslt
 git clone git@github.com:tikalk/go-distribution-workshop.git
 ```
