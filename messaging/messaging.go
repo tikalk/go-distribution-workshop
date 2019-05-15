@@ -51,7 +51,7 @@ func getTransport(){
 	}
 }
 
-func GetOutputChannel(name string) chan<- []byte{
+func GetOutputChannel(name string) chan<- []byte {
 	if transport == nil {
 		getTransport()
 	}
@@ -59,7 +59,7 @@ func GetOutputChannel(name string) chan<- []byte{
 	return transport.Send(name)
 }
 
-func GetInputChannel(name string) <-chan []byte{
+func GetInputChannel(name string) <-chan []byte {
 	if transport == nil {
 		getTransport()
 	}
