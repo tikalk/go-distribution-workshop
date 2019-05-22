@@ -7,7 +7,7 @@ import (
 	"sync"
 	"github.com/tikalk/go-distribution-workshop/apps"
 	"strings"
-	"github.com/pkg/errors"
+	"errors"
 )
 
 var JoinCommand = cli.Command{
